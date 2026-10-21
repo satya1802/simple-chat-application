@@ -78,7 +78,10 @@ from app.main import app
 
 client = TestClient(app)
 email = "llm-qa-" + os.urandom(4).hex() + "@example.com"
-reg = client.post("/auth/register", json={"email": email, "password": "correct-horse-battery-staple"})
+reg = client.post(
+    "/auth/register",
+    json={"email": email, "password": "correct-horse-battery-staple"},
+)
 token = reg.json().get("token", "")
 headers = {"Authorization": f"Bearer {token}"} if token else {}
 
@@ -86,12 +89,17 @@ convo = client.post("/conversations", headers=headers, json={})
 convo_id = (convo.json() or {}).get("id")
 
 if convo_id:
-    client.post(f"/conversations/{convo_id}/messages", headers=headers, json={"content": "hello"})
+    client.post(
+        f"/conversations/{convo_id}/messages", headers=headers, json={"content": "hello"}
+    )
 else:
     # conversation creation not yet implemented/owned by this ticket: still
     # attempt a plausible fixed id so the test surfaces "not implemented"
     # rather than crashing this harness.
-    client.post("/conversations/00000000-0000-0000-0000-000000000000/messages", headers=headers, json={"content": "hello"})
+    fallback_id = "00000000-0000-0000-0000-000000000000"
+    client.post(
+        f"/conversations/{fallback_id}/messages", headers=headers, json={"content": "hello"}
+    )
 
 print("__CAPTURED_JSON__" + json.dumps({"calls": captured, "register_status": reg.status_code}))
 """
@@ -118,8 +126,9 @@ def _run_llm_roundtrip(env_overrides: dict[str, str]) -> dict:
             "harness did not reach the capture point "
             f"(exit={result.returncode}) stdout={result.stdout!r} stderr={result.stderr!r}"
         )
-    line = [l for l in result.stdout.splitlines() if marker in l][-1]
-    return json.loads(line.split(marker, 1)[1])
+    matching_lines = [line for line in result.stdout.splitlines() if marker in line]
+    captured_line = matching_lines[-1]
+    return json.loads(captured_line.split(marker, 1)[1])
 
 
 def test_configured_model_and_custom_system_prompt_reach_the_openai_client():
@@ -129,7 +138,9 @@ def test_configured_model_and_custom_system_prompt_reach_the_openai_client():
     )
     calls = data["calls"]
 
-    assert calls, f"no chat completion was requested (register_status={data.get('register_status')})"
+    assert calls, (
+        f"no chat completion was requested (register_status={data.get('register_status')})"
+    )
     last_call = calls[-1]
 
     assert last_call.get("model") == "gpt-4o-mini-qa-test"
@@ -144,7 +155,9 @@ def test_default_neutral_prompt_is_used_when_system_prompt_is_unset():
     data = _run_llm_roundtrip({"OPENAI_MODEL": "gpt-4o-mini-qa-test"})
     calls = data["calls"]
 
-    assert calls, f"no chat completion was requested (register_status={data.get('register_status')})"
+    assert calls, (
+        f"no chat completion was requested (register_status={data.get('register_status')})"
+    )
     messages = calls[-1].get("messages") or []
     system_messages = [m for m in messages if m.get("role") == "system"]
     assert system_messages, "expected a default system-role message when SYSTEM_PROMPT is unset"
