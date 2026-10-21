@@ -66,6 +66,10 @@ class ConversationRenameResponse(BaseModel):
     title: str
 
 
+class ConversationDeleteResponse(BaseModel):
+    ok: bool = True
+
+
 # --- messages --------------------------------------------------------------------
 
 
