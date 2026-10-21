@@ -5,14 +5,12 @@ development agent does not reinvent them per route. Every value has a default
 that lets a fresh clone start with no environment set, and a deployed instance
 overrides through its environment.
 
-Service keys (``OPENAI_API_KEY``, ``SENDGRID_API_KEY``) are NOT read here --
-the architecture says each feature reads its own key at the point of use and
-turns itself off with a clear message when the key is empty, so the app never
-fails at startup over a missing key. ``services.py`` reports which are set.
-
-``JWT_SECRET`` is the one exception: a session-token secret with no safe
-default, so the app refuses to start when it is missing rather than silently
-signing tokens with a guessable value.
+``JWT_SECRET`` is the one secret with no safe default, so the app refuses to
+start when it is missing rather than silently signing tokens with a guessable
+value. ``OPENAI_API_KEY`` is validated at startup in ``app.main`` -- the
+conversation and message-streaming features cannot function without it.
+``SENDGRID_API_KEY`` remains optional: the password-reset feature turns itself
+off with a clear message when the key is empty (see ``services.py``).
 """
 
 import os
@@ -37,6 +35,14 @@ if not JWT_SECRET:
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRE_MINUTES = int(os.getenv("JWT_EXPIRE_MINUTES", str(60 * 24 * 7)))  # 7 days
 
+# OpenAI model used by the conversation / message streaming features.
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+
+# The system prompt sent as the first message of every conversation. Defaults
+# to a neutral, helpful instruction; override with SYSTEM_PROMPT in the
+# environment to customise the assistant's behaviour.
+SYSTEM_PROMPT = os.getenv("SYSTEM_PROMPT", "You are a helpful assistant.")
+
 # Password-reset tokens. Single-use, stored as a hash, expired after this many
 # minutes. The link the user receives carries the raw token; the database keeps
 # only its hash.
@@ -52,5 +58,7 @@ __all__ = [
     "JWT_EXPIRE_MINUTES",
     "JWT_SECRET",
     "MAX_TITLE_LENGTH",
+    "OPENAI_MODEL",
     "RESET_TOKEN_EXPIRE_MINUTES",
+    "SYSTEM_PROMPT",
 ]

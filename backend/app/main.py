@@ -16,6 +16,15 @@ from app.database import Base, engine
 from app.routers import auth, conversations
 from app.services import configured_services
 
+# OPENAI_API_KEY is required at startup -- the conversation and message
+# streaming features cannot function without it, so the app refuses to start
+# rather than serving a half-broken experience.
+if not os.getenv("OPENAI_API_KEY"):
+    raise RuntimeError(
+        "OPENAI_API_KEY must be set in the environment -- refusing to start "
+        "without an OpenAI API key."
+    )
+
 app = FastAPI(
     title="Simple chat application",
     description="build simple chat application",

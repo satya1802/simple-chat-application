@@ -8,9 +8,13 @@ define the exact shapes the frontend is built against.
 The streaming endpoint (``POST /conversations/{id}/messages``) declares an
 ``text/event-stream`` response so the OpenAPI document advertises SSE; the
 handler itself remains a stub until the sprint implements it.
+
+Every route on this router is scoped to the authenticated user: a valid,
+non-revoked JWT is required, enforced through the ``get_token_payload``
+dependency so a logged-out token cannot reach any handler.
 """
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from app.schemas import (
     ConversationCreateResponse,
@@ -22,8 +26,13 @@ from app.schemas import (
     OkResponse,
     StubResponse,
 )
+from app.security import get_token_payload
 
-router = APIRouter(prefix="/conversations", tags=["conversations"])
+router = APIRouter(
+    prefix="/conversations",
+    tags=["conversations"],
+    dependencies=[Depends(get_token_payload)],
+)
 
 
 @router.get("", response_model=list[ConversationSummary])
