@@ -84,16 +84,6 @@ class MessageCreateRequest(BaseModel):
     content: str = Field(min_length=1)
 
 
-# --- password_reset_tokens -----------------------------------------------------------
-
-
-class PasswordResetTokenOut(BaseModel):
-    id: UUID
-    expires_at: datetime
-    used_at: datetime | None = None
-    created_at: datetime
-
-
 # --- /auth request and response bodies ----------------------------------------------
 
 
@@ -119,14 +109,6 @@ class ForgotPasswordRequest(BaseModel):
     email: EmailStr
 
 
-class ForgotPasswordResponse(BaseModel):
-    message: str
-
-
 class ResetPasswordRequest(BaseModel):
     token: str
     new_password: str = Field(min_length=PASSWORD_MIN_LENGTH)
-
-
-class ResetPasswordResponse(BaseModel):
-    ok: bool

@@ -1,5 +1,5 @@
 // @ts-nocheck -- generated from the approved design under its JS runtime contract; not hand-written TypeScript.
- 
+
 import React from "react";
 
 import * as UI from "@/lib/ui";
@@ -8,21 +8,8 @@ import { brand } from "@/lib/brand";
 import { useNavigate } from "@/lib/navigate";
 import { login as loginRequest, fetchConversations } from "@/lib/auth";
 
-const UIKit = (typeof UI !== "undefined" && UI) || {};
-const IconSet = (typeof Icons !== "undefined" && Icons) || {};
-
-const Button = UIKit.Button || ((p) => React.createElement("button", p));
-const Input = UIKit.Input || ((p) => React.createElement("input", p));
-const Label = UIKit.Label || ((p) => React.createElement("label", p));
-const Checkbox =
-  UIKit.Checkbox || ((p) => React.createElement("input", { type: "checkbox", ...p }));
-
-const Blank = () => null;
-const AlertCircle = IconSet.AlertCircle || Blank;
-const CheckCircle = IconSet.CheckCircle || Blank;
-const ArrowLeft = IconSet.ArrowLeft || Blank;
-const ArrowRight = IconSet.ArrowRight || Blank;
-const Clock = IconSet.Clock || Blank;
+const { Button, Input, Label, Checkbox } = UI;
+const { AlertCircle, CheckCircle, ArrowLeft, ArrowRight, Clock } = Icons;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
