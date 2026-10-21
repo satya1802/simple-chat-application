@@ -1,0 +1,88 @@
+{
+  "architecture_npm": [
+    "react-markdown",
+    "react-syntax-highlighter",
+    "rehype-sanitize",
+    "remark-gfm"
+  ],
+  "key": {
+    "app_design_id": "d121702f-c9cd-4564-bed0-13f40785b182",
+    "app_design_version": 1,
+    "architecture_document_id": "d57a18ab-8f68-441a-ac25-c4540ffd0616",
+    "architecture_version": 1
+  },
+  "outcome": "prepared",
+  "packages": [
+    {
+      "ecosystem": "pypi",
+      "installed_version": "3.35.1",
+      "name": "openai",
+      "status": "installed",
+      "version": ">=1.40"
+    },
+    {
+      "ecosystem": "pypi",
+      "installed_version": "1.7.4",
+      "name": "passlib[bcrypt]",
+      "status": "installed",
+      "version": ">=1.7.4"
+    },
+    {
+      "ecosystem": "pypi",
+      "installed_version": "3.5.0",
+      "name": "python-jose[cryptography]",
+      "status": "installed",
+      "version": ">=3.3"
+    },
+    {
+      "ecosystem": "pypi",
+      "installed_version": "8.1.0",
+      "name": "redis",
+      "status": "installed",
+      "version": ">=5.0"
+    },
+    {
+      "ecosystem": "pypi",
+      "installed_version": "6.12.5",
+      "name": "sendgrid",
+      "status": "installed",
+      "version": ">=6.11"
+    },
+    {
+      "ecosystem": "pypi",
+      "installed_version": "2.3.0",
+      "name": "email-validator",
+      "status": "installed",
+      "version": ">=2.1"
+    },
+    {
+      "ecosystem": "npm",
+      "installed_version": "10.1.0",
+      "name": "react-markdown",
+      "status": "installed",
+      "version": ">=9"
+    },
+    {
+      "ecosystem": "npm",
+      "installed_version": "4.0.1",
+      "name": "remark-gfm",
+      "status": "installed",
+      "version": ">=4"
+    },
+    {
+      "ecosystem": "npm",
+      "installed_version": "6.0.0",
+      "name": "rehype-sanitize",
+      "status": "installed",
+      "version": ">=6"
+    },
+    {
+      "ecosystem": "npm",
+      "installed_version": "16.1.2",
+      "name": "react-syntax-highlighter",
+      "status": "installed",
+      "version": ">=15"
+    }
+  ],
+  "prepared_by_run": "2c11db0c-aab3-4ead-9409-69b42b215c50"
+}
