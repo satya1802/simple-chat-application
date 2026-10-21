@@ -12,6 +12,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app import models  # noqa: F401 -- imported so the tables register before create_all
+from app.config import settings  # noqa: F401 -- import validates OPENAI_API_KEY at startup
 from app.database import Base, engine
 from app.routers import routers
 from app.services import configured_services

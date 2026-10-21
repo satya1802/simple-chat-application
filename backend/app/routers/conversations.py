@@ -1,13 +1,17 @@
 """Conversation and message routes: one per /conversations endpoint the
 approved api_spec declares.
 
-Ownership scoping, the OpenAI streaming proxy and the Redis daily-cap check
-are the development sprint's work. Each handler here is a stub that returns
-a typed placeholder, so the path, method and request body are fixed -- and
-validated by FastAPI -- before that work starts. Every route requires a
-valid, non-revoked session via `get_current_user` so an authenticated-only
-route behaves correctly (401 once logged out) even before its real logic
-lands.
+Ownership scoping, persistence and the Redis daily-cap check are later
+sprint work. Each handler here is a stub that returns a typed placeholder, so
+the path, method and request body are fixed -- and validated by FastAPI --
+before that work starts. Every route requires a valid, non-revoked session
+via `get_current_user` so an authenticated-only route behaves correctly (401
+once logged out) even before its real logic lands.
+
+`send_message` is the one exception: it already calls `app.llm.stream_completion`
+(US-017-1's contract) so the configured model and system prompt are exercised
+end to end, even though the reply is not yet persisted or streamed to the
+browser over SSE -- that proxy is later sprint work too.
 """
 
 from typing import Annotated
@@ -15,6 +19,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends
 
+from app.llm import stream_completion
 from app.models import User
 from app.schemas import ConversationRenameRequest, MessageCreateRequest, StubResponse
 from app.security import get_current_user
@@ -45,12 +50,15 @@ async def list_messages(
 @router.post("/{conversation_id}/messages", response_model=StubResponse)
 async def send_message(
     conversation_id: UUID,  # noqa: ARG001
-    body: MessageCreateRequest,  # noqa: ARG001
+    body: MessageCreateRequest,
     current_user: CurrentUser,  # noqa: ARG001
 ) -> StubResponse:
-    # The real handler streams the assistant reply over SSE (text/event-stream)
-    # after the daily-cap check; the stub returns ordinary JSON since there is
-    # no behaviour yet to stream.
+    # The real handler streams this over SSE (text/event-stream) once
+    # persistence and the daily-cap check land; for now the reply is
+    # consumed and discarded so the configured model/prompt are exercised
+    # without exposing the system prompt or the reply in this stub response.
+    async for _ in stream_completion([{"role": "user", "content": body.content}]):
+        pass
     return StubResponse(endpoint="POST /conversations/{id}/messages")
 
 
