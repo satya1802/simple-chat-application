@@ -7,9 +7,6 @@ import { Icons } from "@/lib/icons";
 import { brand } from "@/lib/brand";
 import { useNavigate } from "@/lib/navigate";
 
-const { Button, Input, Label, Checkbox } = UI;
-const { Check, Clock, ArrowLeft, ArrowRight, AlertCircle, CheckCircle } = Icons;
-
 const UIKit = (typeof UI !== 'undefined' && UI) || {};
 const IconSet = (typeof Icons !== 'undefined' && Icons) || {};
 
