@@ -63,9 +63,9 @@ describe("Chat screen", () => {
     expect(await within(sidebar()).findByText("Newest chat", {}, LONG)).toBeInTheDocument();
     expect(within(sidebar()).getByText("Older chat")).toBeInTheDocument();
     expect(await screen.findByText("Hello there", {}, LONG)).toBeInTheDocument();
-    expect(
-      mockedApiFetch.mock.calls.some((c) => c[0] === "/conversations/c-new/messages"),
-    ).toBe(true);
+    expect(mockedApiFetch.mock.calls.some((c) => c[0] === "/conversations/c-new/messages")).toBe(
+      true,
+    );
   });
 
   it("shows an empty-sidebar message when there are no conversations yet", async () => {
@@ -173,7 +173,8 @@ describe("Chat screen", () => {
         ];
       }
       if (path === "/conversations/c-1/messages") return [msg("m-1", "user", "First chat message")];
-      if (path === "/conversations/c-2/messages") return [msg("m-2", "user", "Second chat message")];
+      if (path === "/conversations/c-2/messages")
+        return [msg("m-2", "user", "Second chat message")];
       throw new Error(`unexpected path ${path}`);
     });
 

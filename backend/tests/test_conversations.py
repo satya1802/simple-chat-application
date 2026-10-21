@@ -126,9 +126,7 @@ def test_another_users_id_on_post_messages_returns_404_with_no_message_added(
     conv_id = _create_conversation(client, token_a)
     _send_message(client, token_a, conv_id, "owned by A")
 
-    before_count = (
-        db_session.query(Message).filter_by(conversation_id=uuid.UUID(conv_id)).count()
-    )
+    before_count = db_session.query(Message).filter_by(conversation_id=uuid.UUID(conv_id)).count()
 
     response = client.post(
         f"/conversations/{conv_id}/messages",
@@ -137,9 +135,7 @@ def test_another_users_id_on_post_messages_returns_404_with_no_message_added(
     )
     assert response.status_code == 404
 
-    after_count = (
-        db_session.query(Message).filter_by(conversation_id=uuid.UUID(conv_id)).count()
-    )
+    after_count = db_session.query(Message).filter_by(conversation_id=uuid.UUID(conv_id)).count()
     assert after_count == before_count
 
 
@@ -147,7 +143,9 @@ def test_a_nonexistent_conversation_id_returns_404_for_every_route(client, uniqu
     token = _register(client, unique_email)
     fake_id = str(uuid.uuid4())
 
-    assert client.get(f"/conversations/{fake_id}/messages", headers=_headers(token)).status_code == 404
+    assert (
+        client.get(f"/conversations/{fake_id}/messages", headers=_headers(token)).status_code == 404
+    )
     assert (
         client.patch(
             f"/conversations/{fake_id}", headers=_headers(token), json={"title": "x"}
@@ -188,7 +186,9 @@ def test_second_message_does_not_change_the_title(client, db_session, patched_op
     title_after_first = conversation_after_first.title
 
     _send_message(client, token, conv_id, "a completely different second message")
-    conversation_after_second = db_session.query(Conversation).filter_by(id=uuid.UUID(conv_id)).one()
+    conversation_after_second = (
+        db_session.query(Conversation).filter_by(id=uuid.UUID(conv_id)).one()
+    )
 
     assert conversation_after_second.title == title_after_first
 

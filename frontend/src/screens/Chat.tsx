@@ -238,7 +238,12 @@ export default function Screen() {
     if (!text || sending) return;
 
     setSendError("");
-    const userMessage = { id: nextLocalId(), role: "user", content: text, created_at: new Date().toISOString() };
+    const userMessage = {
+      id: nextLocalId(),
+      role: "user",
+      content: text,
+      created_at: new Date().toISOString(),
+    };
     setMessages((prev) => [...prev, userMessage]);
     setDraft("");
     setSending(true);
@@ -357,7 +362,10 @@ export default function Screen() {
                   <li
                     key={i}
                     className="h-12 animate-pulse"
-                    style={{ borderRadius: brand.radius, backgroundColor: rgba(brand.neutralColor, 0.08) }}
+                    style={{
+                      borderRadius: brand.radius,
+                      backgroundColor: rgba(brand.neutralColor, 0.08),
+                    }}
                   />
                 ))}
               </ul>
@@ -391,7 +399,10 @@ export default function Screen() {
                         >
                           {c.title}
                         </p>
-                        <p className="mt-0.5 text-xs" style={{ color: rgba(brand.neutralColor, 0.75) }}>
+                        <p
+                          className="mt-0.5 text-xs"
+                          style={{ color: rgba(brand.neutralColor, 0.75) }}
+                        >
                           {formatWhen(c.last_activity_at)}
                         </p>
                       </button>
@@ -416,7 +427,11 @@ export default function Screen() {
               aria-expanded={sidebarOpen}
               aria-controls="chat-list"
               className="mt-0.5 shrink-0 p-2 md:hidden"
-              style={{ borderRadius: brand.radius, backgroundColor: rgba(brand.neutralColor, 0.08), color: brand.primaryColor }}
+              style={{
+                borderRadius: brand.radius,
+                backgroundColor: rgba(brand.neutralColor, 0.08),
+                color: brand.primaryColor,
+              }}
             >
               <Menu className="h-4 w-4" aria-hidden="true" />
             </button>
@@ -472,7 +487,11 @@ export default function Screen() {
             <div
               role="alert"
               className="mx-4 mb-2 flex items-center gap-2 px-3.5 py-2 sm:mx-7"
-              style={{ borderRadius: brand.radius, backgroundColor: rgba(brand.accentColor, 0.1), color: brand.accentColor }}
+              style={{
+                borderRadius: brand.radius,
+                backgroundColor: rgba(brand.accentColor, 0.1),
+                color: brand.accentColor,
+              }}
             >
               <AlertCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
               <span className="text-[0.82rem] font-medium">{sendError}</span>

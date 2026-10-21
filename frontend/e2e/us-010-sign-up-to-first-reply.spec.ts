@@ -26,7 +26,10 @@ test.describe("sign-up to first reply (AC-032, AC-033, AC-034)", () => {
 
     await page.goto("/sign-up");
     await page.getByLabel(/email/i).first().fill(email);
-    await page.getByLabel(/password/i).first().fill(PASSWORD);
+    await page
+      .getByLabel(/password/i)
+      .first()
+      .fill(PASSWORD);
     await page
       .getByRole("button", { name: /sign up|create account|open your first chat/i })
       .first()
@@ -78,7 +81,10 @@ test.describe("sign-in failure and sign-out (AC-004, AC-005)", () => {
     // Register so the email exists, then sign out, then try the wrong password.
     await page.goto("/sign-up");
     await page.getByLabel(/email/i).first().fill(email);
-    await page.getByLabel(/password/i).first().fill(PASSWORD);
+    await page
+      .getByLabel(/password/i)
+      .first()
+      .fill(PASSWORD);
     await page
       .getByRole("button", { name: /sign up|create account|open your first chat/i })
       .first()
@@ -89,7 +95,10 @@ test.describe("sign-in failure and sign-out (AC-004, AC-005)", () => {
     await expect(page).toHaveURL(/\/sign-in/, { timeout: 10_000 });
 
     await page.getByLabel(/email/i).first().fill(email);
-    await page.getByLabel(/^password/i).first().fill("definitely-the-wrong-password");
+    await page
+      .getByLabel(/^password/i)
+      .first()
+      .fill("definitely-the-wrong-password");
     await page.getByRole("button", { name: /sign in|log in/i }).click();
 
     await expect(page.getByRole("alert")).toContainText(/incorrect/i, { timeout: 10_000 });
@@ -101,7 +110,10 @@ test.describe("sign-in failure and sign-out (AC-004, AC-005)", () => {
 
     await page.goto("/sign-up");
     await page.getByLabel(/email/i).first().fill(email);
-    await page.getByLabel(/password/i).first().fill(PASSWORD);
+    await page
+      .getByLabel(/password/i)
+      .first()
+      .fill(PASSWORD);
     await page
       .getByRole("button", { name: /sign up|create account|open your first chat/i })
       .first()
@@ -124,7 +136,10 @@ test.describe("'New chat' (AC-032, AC-034)", () => {
 
     await page.goto("/sign-up");
     await page.getByLabel(/email/i).first().fill(email);
-    await page.getByLabel(/password/i).first().fill(PASSWORD);
+    await page
+      .getByLabel(/password/i)
+      .first()
+      .fill(PASSWORD);
     await page
       .getByRole("button", { name: /sign up|create account|open your first chat/i })
       .first()
