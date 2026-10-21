@@ -10,30 +10,18 @@ import { useNavigate } from "@/lib/navigate";
 const { Button, Input, Label, Checkbox } = UI;
 const { Check, Clock, ArrowLeft, ArrowRight, AlertCircle, CheckCircle } = Icons;
 
-const UIKit = (typeof UI !== 'undefined' && UI) || {};
-const IconSet = (typeof Icons !== 'undefined' && Icons) || {};
-
-const Button = UIKit.Button || ((p) => React.createElement('button', p));
-const Input = UIKit.Input || ((p) => React.createElement('input', p));
-const Label = UIKit.Label || ((p) => React.createElement('label', p));
-const Checkbox = UIKit.Checkbox || ((p) => React.createElement('input', { type: 'checkbox', ...p }));
-
-const Blank = () => null;
-const AlertCircle = IconSet.AlertCircle || Blank;
-const CheckCircle = IconSet.CheckCircle || Blank;
-const ArrowLeft = IconSet.ArrowLeft || Blank;
-const ArrowRight = IconSet.ArrowRight || Blank;
-const Clock = IconSet.Clock || Blank;
-
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // The one account that signs in successfully in this prototype build.
-const KNOWN_ACCOUNT = { email: 'mara.okonkwo@gmail.com', password: 'pockettalk' };
+const KNOWN_ACCOUNT = { email: "mara.okonkwo@gmail.com", password: "pockettalk" };
 
 const PREVIEW_THREAD = [
-  { role: 'user', text: 'Rewrite my sourdough notes as a checklist' },
-  { role: 'assistant', text: 'Sure — nine steps, starter to bake. Want timings in hours or clock times?' },
-  { role: 'user', text: 'Clock times, I start at 7am' }
+  { role: "user", text: "Rewrite my sourdough notes as a checklist" },
+  {
+    role: "assistant",
+    text: "Sure — nine steps, starter to bake. Want timings in hours or clock times?",
+  },
+  { role: "user", text: "Clock times, I start at 7am" },
 ];
 
 const LOCK_SECONDS = 30;
@@ -41,17 +29,17 @@ const MAX_ATTEMPTS = 3;
 
 export default function Screen() {
   const navigate = useNavigate();
-  const [mode, setMode] = React.useState('signin'); // signin | forgot | sent
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
+  const [mode, setMode] = React.useState("signin"); // signin | forgot | sent
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
   const [remember, setRemember] = React.useState(true);
   const [showPassword, setShowPassword] = React.useState(false);
   const [fieldErrors, setFieldErrors] = React.useState({});
   const [banner, setBanner] = React.useState(null); // { tone, title, body }
-  const [status, setStatus] = React.useState('idle'); // idle | submitting | success | sending
+  const [status, setStatus] = React.useState("idle"); // idle | submitting | success | sending
   const [attempts, setAttempts] = React.useState(0);
   const [cooldown, setCooldown] = React.useState(0);
-  const [sentTo, setSentTo] = React.useState('');
+  const [sentTo, setSentTo] = React.useState("");
   const [resends, setResends] = React.useState(0);
 
   const emailRef = React.useRef(null);
@@ -80,23 +68,23 @@ export default function Screen() {
   }, [cooldown, attempts]);
 
   const locked = cooldown > 0;
-  const busy = status === 'submitting' || status === 'sending' || status === 'success';
+  const busy = status === "submitting" || status === "sending" || status === "success";
 
   const ink = brand.primaryColor;
   const muted = brand.neutralColor;
-  const hairline = brand.neutralColor + '2E';
-  const ringStyle = { '--tw-ring-color': brand.primaryColor };
+  const hairline = brand.neutralColor + "2E";
+  const ringStyle = { "--tw-ring-color": brand.primaryColor };
 
   const fieldClass =
-    'w-full bg-white px-4 py-3 text-[15px] outline-none transition-shadow duration-150 ' +
-    'focus:ring-2 focus:ring-offset-2 focus-visible:ring-2 focus-visible:ring-offset-2';
+    "w-full bg-white px-4 py-3 text-[15px] outline-none transition-shadow duration-150 " +
+    "focus:ring-2 focus:ring-offset-2 focus-visible:ring-2 focus-visible:ring-offset-2";
 
   const fieldStyle = (invalid) => ({
     borderRadius: brand.radius,
-    border: '1px solid ' + (invalid ? brand.accentColor : hairline),
+    border: "1px solid " + (invalid ? brand.accentColor : hairline),
     color: ink,
     fontFamily: brand.fontBody,
-    ...ringStyle
+    ...ringStyle,
   });
 
   function resetFeedback() {
@@ -110,9 +98,10 @@ export default function Screen() {
 
     const trimmed = email.trim();
     const errs = {};
-    if (!trimmed) errs.email = 'Enter the email you signed up with.';
-    else if (!EMAIL_RE.test(trimmed)) errs.email = 'That doesn’t look like an email address — check for a typo.';
-    if (!password) errs.password = 'Enter your password.';
+    if (!trimmed) errs.email = "Enter the email you signed up with.";
+    else if (!EMAIL_RE.test(trimmed))
+      errs.email = "That doesn’t look like an email address — check for a typo.";
+    if (!password) errs.password = "Enter your password.";
 
     if (Object.keys(errs).length) {
       setFieldErrors(errs);
@@ -122,15 +111,15 @@ export default function Screen() {
     }
 
     resetFeedback();
-    setStatus('submitting');
+    setStatus("submitting");
 
     later(() => {
       if (/@example\.com$/i.test(trimmed)) {
-        setStatus('idle');
+        setStatus("idle");
         setBanner({
-          tone: 'warn',
-          title: 'We couldn’t reach Pocket Talk',
-          body: 'The sign-in request timed out on its way to the server. Your email and password are still here — try again in a moment.'
+          tone: "warn",
+          title: "We couldn’t reach Pocket Talk",
+          body: "The sign-in request timed out on its way to the server. Your email and password are still here — try again in a moment.",
         });
         return;
       }
@@ -139,28 +128,28 @@ export default function Screen() {
         trimmed.toLowerCase() === KNOWN_ACCOUNT.email && password === KNOWN_ACCOUNT.password;
 
       if (ok) {
-        setStatus('success');
-        later(() => navigate('chat'), 900);
+        setStatus("success");
+        later(() => navigate("chat"), 900);
         return;
       }
 
       const next = attempts + 1;
       setAttempts(next);
-      setStatus('idle');
-      setPassword('');
+      setStatus("idle");
+      setPassword("");
 
       if (next >= MAX_ATTEMPTS) {
         setCooldown(LOCK_SECONDS);
         setBanner({
-          tone: 'warn',
-          title: 'Too many tries',
-          body: 'Sign-in is paused for a moment to keep your account safe. You can reset your password while you wait.'
+          tone: "warn",
+          title: "Too many tries",
+          body: "Sign-in is paused for a moment to keep your account safe. You can reset your password while you wait.",
         });
       } else {
         setBanner({
-          tone: 'error',
-          title: 'Email or password is incorrect',
-          body: 'Check the password and try again — we don’t say which part was wrong on purpose.'
+          tone: "error",
+          title: "Email or password is incorrect",
+          body: "Check the password and try again — we don’t say which part was wrong on purpose.",
         });
         passwordRef.current?.focus();
       }
@@ -173,43 +162,46 @@ export default function Screen() {
 
     const trimmed = email.trim();
     if (!trimmed) {
-      setFieldErrors({ email: 'Enter the email on your account so we know where to send the link.' });
+      setFieldErrors({
+        email: "Enter the email on your account so we know where to send the link.",
+      });
       emailRef.current?.focus();
       return;
     }
     if (!EMAIL_RE.test(trimmed)) {
-      setFieldErrors({ email: 'That doesn’t look like an email address — check for a typo.' });
+      setFieldErrors({ email: "That doesn’t look like an email address — check for a typo." });
       emailRef.current?.focus();
       return;
     }
 
     resetFeedback();
-    setStatus('sending');
+    setStatus("sending");
     later(() => {
       setSentTo(trimmed);
       setResends(0);
-      setStatus('idle');
-      setMode('sent');
+      setStatus("idle");
+      setMode("sent");
     }, 850);
   }
 
   function goToForgot() {
     resetFeedback();
-    setStatus('idle');
-    setMode('forgot');
+    setStatus("idle");
+    setMode("forgot");
     later(() => emailRef.current?.focus(), 30);
   }
 
   function goToSignIn() {
     resetFeedback();
-    setStatus('idle');
-    setMode('signin');
+    setStatus("idle");
+    setMode("signin");
     later(() => emailRef.current?.focus(), 30);
   }
 
-  const bannerTone = banner && banner.tone === 'error'
-    ? { bg: brand.accentColor + '14', border: brand.accentColor + '59', fg: brand.accentColor }
-    : { bg: brand.accentColor + '0F', border: brand.accentColor + '45', fg: brand.accentColor };
+  const bannerTone =
+    banner && banner.tone === "error"
+      ? { bg: brand.accentColor + "14", border: brand.accentColor + "59", fg: brand.accentColor }
+      : { bg: brand.accentColor + "0F", border: brand.accentColor + "45", fg: brand.accentColor };
 
   const Keyframes = (
     <style>{`
@@ -230,7 +222,6 @@ export default function Screen() {
     >
       {Keyframes}
       <div className="mx-auto grid min-h-screen w-full max-w-6xl lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
-
         {/* ---------- Brand panel (desktop) ---------- */}
         <aside
           className="relative hidden flex-col justify-between overflow-hidden p-12 lg:flex"
@@ -239,7 +230,7 @@ export default function Screen() {
           <div className="flex items-center gap-3">
             <span
               className="grid h-9 w-9 place-items-center text-sm font-bold text-white"
-              style={{ backgroundColor: brand.accentColor, borderRadius: '1rem 1rem 0.25rem 1rem' }}
+              style={{ backgroundColor: brand.accentColor, borderRadius: "1rem 1rem 0.25rem 1rem" }}
               aria-hidden="true"
             >
               PT
@@ -259,18 +250,22 @@ export default function Screen() {
               {PREVIEW_THREAD.map((m, i) => (
                 <li
                   key={i}
-                  className={'pt-rise flex ' + (m.role === 'user' ? 'justify-end' : 'justify-start')}
-                  style={{ animationDelay: 90 * i + 'ms' }}
+                  className={
+                    "pt-rise flex " + (m.role === "user" ? "justify-end" : "justify-start")
+                  }
+                  style={{ animationDelay: 90 * i + "ms" }}
                 >
                   <span
                     className={
-                      'max-w-[84%] px-4 py-2.5 text-[13.5px] leading-relaxed ' +
-                      (m.role === 'user' ? 'bg-white/90' : 'bg-white/12 text-white')
+                      "max-w-[84%] px-4 py-2.5 text-[13.5px] leading-relaxed " +
+                      (m.role === "user" ? "bg-white/90" : "bg-white/12 text-white")
                     }
                     style={{
-                      color: m.role === 'user' ? ink : undefined,
+                      color: m.role === "user" ? ink : undefined,
                       borderRadius:
-                        m.role === 'user' ? '1.1rem 1.1rem 0.3rem 1.1rem' : '1.1rem 1.1rem 1.1rem 0.3rem'
+                        m.role === "user"
+                          ? "1.1rem 1.1rem 0.3rem 1.1rem"
+                          : "1.1rem 1.1rem 1.1rem 0.3rem",
                     }}
                   >
                     {m.text}
@@ -280,13 +275,13 @@ export default function Screen() {
               <li className="flex justify-start">
                 <span
                   className="flex items-center gap-1.5 bg-white/12 px-4 py-3"
-                  style={{ borderRadius: '1.1rem 1.1rem 1.1rem 0.3rem' }}
+                  style={{ borderRadius: "1.1rem 1.1rem 1.1rem 0.3rem" }}
                 >
                   {[0, 1, 2].map((d) => (
                     <span
                       key={d}
                       className="pt-dot block h-1.5 w-1.5 rounded-full bg-white"
-                      style={{ animationDelay: d * 180 + 'ms' }}
+                      style={{ animationDelay: d * 180 + "ms" }}
                     />
                   ))}
                 </span>
@@ -303,11 +298,13 @@ export default function Screen() {
         {/* ---------- Form column ---------- */}
         <main className="flex items-center justify-center px-5 py-12 sm:px-12">
           <div className="w-full max-w-[25.5rem]">
-
             <div className="mb-9 flex items-center gap-2.5 lg:hidden">
               <span
                 className="grid h-8 w-8 place-items-center text-[12px] font-bold text-white"
-                style={{ backgroundColor: brand.accentColor, borderRadius: '0.9rem 0.9rem 0.25rem 0.9rem' }}
+                style={{
+                  backgroundColor: brand.accentColor,
+                  borderRadius: "0.9rem 0.9rem 0.25rem 0.9rem",
+                }}
                 aria-hidden="true"
               >
                 PT
@@ -317,12 +314,12 @@ export default function Screen() {
               </span>
             </div>
 
-            {mode === 'sent' ? (
+            {mode === "sent" ? (
               /* ---------- Reset link sent ---------- */
               <div className="pt-rise">
                 <span
                   className="mb-6 grid h-11 w-11 place-items-center"
-                  style={{ backgroundColor: ink + '14', borderRadius: brand.radius }}
+                  style={{ backgroundColor: ink + "14", borderRadius: brand.radius }}
                 >
                   <CheckCircle className="h-5 w-5" style={{ color: ink }} aria-hidden="true" />
                 </span>
@@ -333,14 +330,18 @@ export default function Screen() {
                   Check your email
                 </h1>
                 <p className="mt-3 text-[15px] leading-relaxed" style={{ color: muted }}>
-                  If <span className="font-medium" style={{ color: ink }}>{sentTo}</span> has a Pocket Talk
-                  account, a reset link is on its way. It works once and expires 30 minutes after it was sent.
+                  If{" "}
+                  <span className="font-medium" style={{ color: ink }}>
+                    {sentTo}
+                  </span>{" "}
+                  has a Pocket Talk account, a reset link is on its way. It works once and expires
+                  30 minutes after it was sent.
                 </p>
 
                 <div className="mt-8 space-y-3">
                   <Button
                     type="button"
-                    onClick={() => navigate('reset-password')}
+                    onClick={() => navigate("reset-password")}
                     className="flex h-12 w-full items-center justify-center gap-2 text-[15px] font-semibold text-white transition-opacity duration-150 hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                     style={{ backgroundColor: ink, borderRadius: brand.radius, ...ringStyle }}
                   >
@@ -351,20 +352,28 @@ export default function Screen() {
                     type="button"
                     onClick={goToSignIn}
                     className="flex h-12 w-full items-center justify-center gap-2 bg-white text-[15px] font-medium transition-colors duration-150 hover:bg-black/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-                    style={{ border: '1px solid ' + hairline, color: ink, borderRadius: brand.radius, ...ringStyle }}
+                    style={{
+                      border: "1px solid " + hairline,
+                      color: ink,
+                      borderRadius: brand.radius,
+                      ...ringStyle,
+                    }}
                   >
                     <ArrowLeft className="h-4 w-4" aria-hidden="true" />
                     Back to sign in
                   </Button>
                 </div>
 
-                <div className="mt-7 border-t pt-5 text-[13.5px]" style={{ borderColor: hairline, color: muted }}>
-                  Nothing in your inbox after a minute? Look in spam, then{' '}
+                <div
+                  className="mt-7 border-t pt-5 text-[13.5px]"
+                  style={{ borderColor: hairline, color: muted }}
+                >
+                  Nothing in your inbox after a minute? Look in spam, then{" "}
                   <button
                     type="button"
                     onClick={() => setResends((r) => r + 1)}
                     className="font-semibold underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-                    style={{ color: ink, borderRadius: '0.25rem', ...ringStyle }}
+                    style={{ color: ink, borderRadius: "0.25rem", ...ringStyle }}
                   >
                     send it again
                   </button>
@@ -385,12 +394,12 @@ export default function Screen() {
                   className="text-[30px] font-semibold leading-tight tracking-tight sm:text-[34px]"
                   style={{ fontFamily: brand.fontHeading, color: ink }}
                 >
-                  {mode === 'signin' ? 'Welcome back' : 'Forgot your password?'}
+                  {mode === "signin" ? "Welcome back" : "Forgot your password?"}
                 </h1>
                 <p className="mt-3 text-[15px] leading-relaxed" style={{ color: muted }}>
-                  {mode === 'signin'
-                    ? 'Sign in to pick your conversations back up, mid-sentence if you like.'
-                    : 'Give us the email on your account and we’ll send a single-use link that expires in 30 minutes.'}
+                  {mode === "signin"
+                    ? "Sign in to pick your conversations back up, mid-sentence if you like."
+                    : "Give us the email on your account and we’ll send a single-use link that expires in 30 minutes."}
                 </p>
 
                 {/* Banner: error / rate limit / network */}
@@ -401,8 +410,8 @@ export default function Screen() {
                       className="pt-rise mt-6 flex gap-3 p-4"
                       style={{
                         backgroundColor: bannerTone.bg,
-                        border: '1px solid ' + bannerTone.border,
-                        borderRadius: brand.radius
+                        border: "1px solid " + bannerTone.border,
+                        borderRadius: brand.radius,
                       }}
                     >
                       <AlertCircle
@@ -420,7 +429,7 @@ export default function Screen() {
                         {locked && (
                           <p
                             className="mt-2 flex items-center gap-1.5 text-[13px] font-semibold"
-                            style={{ color: bannerTone.fg, fontVariantNumeric: 'tabular-nums' }}
+                            style={{ color: bannerTone.fg, fontVariantNumeric: "tabular-nums" }}
                           >
                             <Clock className="h-4 w-4" aria-hidden="true" />
                             Try again in {cooldown}s
@@ -433,12 +442,20 @@ export default function Screen() {
 
                 {/* Success */}
                 <div aria-live="polite">
-                  {status === 'success' && (
+                  {status === "success" && (
                     <div
                       className="pt-rise mt-6 flex items-center gap-3 p-4"
-                      style={{ backgroundColor: ink + '12', border: '1px solid ' + ink + '33', borderRadius: brand.radius }}
+                      style={{
+                        backgroundColor: ink + "12",
+                        border: "1px solid " + ink + "33",
+                        borderRadius: brand.radius,
+                      }}
                     >
-                      <CheckCircle className="h-[18px] w-[18px] shrink-0" style={{ color: ink }} aria-hidden="true" />
+                      <CheckCircle
+                        className="h-[18px] w-[18px] shrink-0"
+                        style={{ color: ink }}
+                        aria-hidden="true"
+                      />
                       <p className="text-[14px] font-medium" style={{ color: ink }}>
                         Signed in. Opening your conversations…
                       </p>
@@ -448,7 +465,7 @@ export default function Screen() {
 
                 <form
                   className="mt-7 space-y-5"
-                  onSubmit={mode === 'signin' ? handleSignIn : handleForgot}
+                  onSubmit={mode === "signin" ? handleSignIn : handleForgot}
                   noValidate
                 >
                   <div>
@@ -472,8 +489,8 @@ export default function Screen() {
                         if (fieldErrors.email) setFieldErrors((f) => ({ ...f, email: undefined }));
                       }}
                       placeholder="you@example.com"
-                      aria-invalid={fieldErrors.email ? 'true' : 'false'}
-                      aria-describedby={fieldErrors.email ? 'email-error' : undefined}
+                      aria-invalid={fieldErrors.email ? "true" : "false"}
+                      aria-describedby={fieldErrors.email ? "email-error" : undefined}
                       className={fieldClass}
                       style={fieldStyle(!!fieldErrors.email)}
                     />
@@ -489,7 +506,7 @@ export default function Screen() {
                     )}
                   </div>
 
-                  {mode === 'signin' && (
+                  {mode === "signin" && (
                     <div>
                       <div className="mb-1.5 flex items-baseline justify-between gap-3">
                         <Label
@@ -504,25 +521,26 @@ export default function Screen() {
                           onClick={() => setShowPassword((s) => !s)}
                           aria-pressed={showPassword}
                           className="text-[12.5px] font-semibold underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-                          style={{ color: ink, borderRadius: '0.25rem', ...ringStyle }}
+                          style={{ color: ink, borderRadius: "0.25rem", ...ringStyle }}
                         >
-                          {showPassword ? 'Hide' : 'Show'}
+                          {showPassword ? "Hide" : "Show"}
                         </button>
                       </div>
                       <Input
                         id="password"
                         name="password"
-                        type={showPassword ? 'text' : 'password'}
+                        type={showPassword ? "text" : "password"}
                         autoComplete="current-password"
                         ref={passwordRef}
                         value={password}
                         onChange={(e) => {
                           setPassword(e.target.value);
-                          if (fieldErrors.password) setFieldErrors((f) => ({ ...f, password: undefined }));
+                          if (fieldErrors.password)
+                            setFieldErrors((f) => ({ ...f, password: undefined }));
                         }}
                         placeholder="Your password"
-                        aria-invalid={fieldErrors.password ? 'true' : 'false'}
-                        aria-describedby={fieldErrors.password ? 'password-error' : undefined}
+                        aria-invalid={fieldErrors.password ? "true" : "false"}
+                        aria-describedby={fieldErrors.password ? "password-error" : undefined}
                         className={fieldClass}
                         style={fieldStyle(!!fieldErrors.password)}
                       />
@@ -539,7 +557,7 @@ export default function Screen() {
                     </div>
                   )}
 
-                  {mode === 'signin' && (
+                  {mode === "signin" && (
                     <div className="flex items-center justify-between gap-4 pt-0.5">
                       <div className="flex items-center gap-2.5">
                         <Checkbox
@@ -559,7 +577,7 @@ export default function Screen() {
                         type="button"
                         onClick={goToForgot}
                         className="text-[14px] font-semibold underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-                        style={{ color: ink, borderRadius: '0.25rem', ...ringStyle }}
+                        style={{ color: ink, borderRadius: "0.25rem", ...ringStyle }}
                       >
                         Forgot password?
                       </button>
@@ -568,24 +586,24 @@ export default function Screen() {
 
                   <Button
                     type="submit"
-                    disabled={busy || (mode === 'signin' && locked)}
+                    disabled={busy || (mode === "signin" && locked)}
                     className="flex h-12 w-full items-center justify-center gap-2 text-[15px] font-semibold text-white transition-opacity duration-150 hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-55"
                     style={{ backgroundColor: ink, borderRadius: brand.radius, ...ringStyle }}
                   >
-                    {mode === 'signin'
-                      ? status === 'submitting'
-                        ? 'Checking your details…'
-                        : status === 'success'
-                          ? 'Signed in'
+                    {mode === "signin"
+                      ? status === "submitting"
+                        ? "Checking your details…"
+                        : status === "success"
+                          ? "Signed in"
                           : locked
-                            ? 'Paused for ' + cooldown + 's'
-                            : 'Sign in'
-                      : status === 'sending'
-                        ? 'Sending your link…'
-                        : 'Email me a reset link'}
+                            ? "Paused for " + cooldown + "s"
+                            : "Sign in"
+                      : status === "sending"
+                        ? "Sending your link…"
+                        : "Email me a reset link"}
                   </Button>
 
-                  {mode === 'forgot' && (
+                  {mode === "forgot" && (
                     <Button
                       type="button"
                       onClick={goToSignIn}
@@ -598,34 +616,37 @@ export default function Screen() {
                   )}
                 </form>
 
-                {mode === 'signin' && (
+                {mode === "signin" && (
                   <>
                     <p
                       className="mt-8 border-t pt-6 text-center text-[14px]"
                       style={{ borderColor: hairline, color: muted }}
                     >
-                      New to Pocket Talk?{' '}
+                      New to Pocket Talk?{" "}
                       <button
                         type="button"
-                        onClick={() => navigate('sign-up')}
+                        onClick={() => navigate("sign-up")}
                         className="font-semibold underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-                        style={{ color: ink, borderRadius: '0.25rem', ...ringStyle }}
+                        style={{ color: ink, borderRadius: "0.25rem", ...ringStyle }}
                       >
                         Create an account
-                      </button>{' '}
+                      </button>{" "}
                       — it takes an email and a password.
                     </p>
 
                     <div
                       className="mt-6 p-4"
-                      style={{ backgroundColor: ink + '0A', borderRadius: brand.radius }}
+                      style={{ backgroundColor: ink + "0A", borderRadius: brand.radius }}
                     >
-                      <p className="text-[12.5px] font-semibold uppercase tracking-wide" style={{ color: muted }}>
+                      <p
+                        className="text-[12.5px] font-semibold uppercase tracking-wide"
+                        style={{ color: muted }}
+                      >
                         Demo account
                       </p>
                       <p
                         className="mt-1.5 text-[13.5px] leading-relaxed"
-                        style={{ color: muted, fontVariantNumeric: 'tabular-nums' }}
+                        style={{ color: muted, fontVariantNumeric: "tabular-nums" }}
                       >
                         {KNOWN_ACCOUNT.email} · {KNOWN_ACCOUNT.password}
                       </p>
@@ -638,7 +659,7 @@ export default function Screen() {
                           later(() => passwordRef.current?.focus(), 20);
                         }}
                         className="mt-2 text-[13.5px] font-semibold underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-                        style={{ color: brand.accentColor, borderRadius: '0.25rem', ...ringStyle }}
+                        style={{ color: brand.accentColor, borderRadius: "0.25rem", ...ringStyle }}
                       >
                         Fill these in for me
                       </button>

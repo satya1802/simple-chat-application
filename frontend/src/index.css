@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  --brand-primary: #2F5D50;
-  --brand-accent: #B4552D;
-  --brand-neutral: #6E675E;
+  --brand-primary: #2f5d50;
+  --brand-accent: #b4552d;
+  --brand-neutral: #6e675e;
   --brand-radius: 0.5rem;
   --brand-font-heading: Inter, system-ui, sans-serif;
   --brand-font-body: Inter, system-ui, sans-serif;
@@ -12,7 +12,7 @@
   --brand-fg: #0f172a;
   --brand-fg-muted: #64748b;
   --brand-hover: #f1f5f9;
-  --brand-background: #FAF7F1;
+  --brand-background: #faf7f1;
 }
 
 body {

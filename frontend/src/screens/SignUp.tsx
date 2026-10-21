@@ -67,8 +67,7 @@ function validateFields(email, password) {
   if (!password) {
     next.password = "Choose a password so you can sign back in later.";
   } else if (password.length < 8) {
-    next.password =
-      "Passwords need at least 8 characters — yours has " + password.length + ".";
+    next.password = "Passwords need at least 8 characters — yours has " + password.length + ".";
   }
   return next;
 }
@@ -102,13 +101,8 @@ export default function Screen() {
   }, [status]);
 
   const strength = scorePassword(password);
-  const strengthWord = password.length === 0
-    ? ""
-    : strength === 0
-    ? "Too short"
-    : strength === 1
-    ? "Good"
-    : "Strong";
+  const strengthWord =
+    password.length === 0 ? "" : strength === 0 ? "Too short" : strength === 1 ? "Good" : "Strong";
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -157,8 +151,14 @@ export default function Screen() {
     "@keyframes ptDot{0%,80%,100%{transform:translateY(0);opacity:.35}40%{transform:translateY(-4px);opacity:1}}" +
     ".pt-rise{animation:ptRise .36s cubic-bezier(.2,.7,.3,1) both}" +
     ".pt-dot{animation:ptDot 1.2s infinite ease-in-out}" +
-    ".pt-focus:focus-visible{outline:2px solid " + brand.primaryColor + ";outline-offset:2px;border-radius:" + brand.radius + "}" +
-    ".pt-field:focus-within{box-shadow:0 0 0 3px " + brand.primaryColor + "22}" +
+    ".pt-focus:focus-visible{outline:2px solid " +
+    brand.primaryColor +
+    ";outline-offset:2px;border-radius:" +
+    brand.radius +
+    "}" +
+    ".pt-field:focus-within{box-shadow:0 0 0 3px " +
+    brand.primaryColor +
+    "22}" +
     "@media (prefers-reduced-motion: reduce){.pt-rise,.pt-dot{animation:none!important}}";
 
   const labelStyle = {
@@ -192,12 +192,24 @@ export default function Screen() {
           <div className="flex items-center gap-3">
             <div
               className="relative flex h-9 w-9 items-center justify-center"
-              style={{ backgroundColor: brand.primaryColor, borderRadius: "0.9rem 0.9rem 0.9rem 0.25rem" }}
+              style={{
+                backgroundColor: brand.primaryColor,
+                borderRadius: "0.9rem 0.9rem 0.9rem 0.25rem",
+              }}
               aria-hidden="true"
             >
-              <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: brand.backgroundColor }} />
-              <span className="mx-1 h-1.5 w-1.5 rounded-full" style={{ backgroundColor: brand.backgroundColor }} />
-              <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: brand.accentColor }} />
+              <span
+                className="h-1.5 w-1.5 rounded-full"
+                style={{ backgroundColor: brand.backgroundColor }}
+              />
+              <span
+                className="mx-1 h-1.5 w-1.5 rounded-full"
+                style={{ backgroundColor: brand.backgroundColor }}
+              />
+              <span
+                className="h-1.5 w-1.5 rounded-full"
+                style={{ backgroundColor: brand.accentColor }}
+              />
             </div>
             <span
               className="text-[1.05rem] font-semibold tracking-tight"
@@ -249,12 +261,18 @@ export default function Screen() {
                     <div className="flex items-start gap-4">
                       <span
                         className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
-                        style={{ backgroundColor: brand.primaryColor + "1A", color: brand.primaryColor }}
+                        style={{
+                          backgroundColor: brand.primaryColor + "1A",
+                          color: brand.primaryColor,
+                        }}
                       >
                         <CheckCircle className="h-5 w-5" aria-hidden="true" />
                       </span>
                       <div className="min-w-0">
-                        <h2 className="text-base font-semibold" style={{ fontFamily: brand.fontHeading }}>
+                        <h2
+                          className="text-base font-semibold"
+                          style={{ fontFamily: brand.fontHeading }}
+                        >
                           Account created — no email to confirm
                         </h2>
                         <p className="mt-1.5 text-sm" style={{ color: brand.neutralColor }}>
@@ -262,7 +280,10 @@ export default function Screen() {
                             ? "We'll keep you signed in on this device until you sign out."
                             : "You'll be asked to sign in again next time you open Pocket Talk."}
                         </p>
-                        <dl className="mt-5 grid grid-cols-2 gap-5 text-sm" style={{ fontVariantNumeric: "tabular-nums" }}>
+                        <dl
+                          className="mt-5 grid grid-cols-2 gap-5 text-sm"
+                          style={{ fontVariantNumeric: "tabular-nums" }}
+                        >
                           <div>
                             <dt style={labelStyle}>Messages today</dt>
                             <dd className="mt-1 text-lg font-semibold">0 / 40</dd>
@@ -298,7 +319,10 @@ export default function Screen() {
               </div>
             ) : (
               <div>
-                <p className="text-sm font-semibold" style={{ color: brand.accentColor, letterSpacing: "0.08em" }}>
+                <p
+                  className="text-sm font-semibold"
+                  style={{ color: brand.accentColor, letterSpacing: "0.08em" }}
+                >
                   FREE WHILE IN PREVIEW
                 </p>
                 <h1
@@ -308,9 +332,12 @@ export default function Screen() {
                   Start chatting in
                   <br className="hidden sm:block" /> about twenty seconds.
                 </h1>
-                <p className="mt-4 max-w-md text-base leading-relaxed" style={{ color: brand.neutralColor }}>
-                  An email address and a password is all it takes. No verification link to chase,
-                  no credit card, no set-up wizard.
+                <p
+                  className="mt-4 max-w-md text-base leading-relaxed"
+                  style={{ color: brand.neutralColor }}
+                >
+                  An email address and a password is all it takes. No verification link to chase, no
+                  credit card, no set-up wizard.
                 </p>
 
                 <Card
@@ -443,7 +470,10 @@ export default function Screen() {
                             <p
                               id="signup-password-error"
                               className="pt-rise mt-2 flex items-center gap-2 text-sm"
-                              style={{ color: brand.accentColor, fontVariantNumeric: "tabular-nums" }}
+                              style={{
+                                color: brand.accentColor,
+                                fontVariantNumeric: "tabular-nums",
+                              }}
                             >
                               <X className="h-4 w-4 shrink-0" aria-hidden="true" />
                               {errors.password}
@@ -463,17 +493,20 @@ export default function Screen() {
                                         password.length === 0
                                           ? "#E4DED2"
                                           : i <= strength
-                                          ? strength === 0
-                                            ? brand.accentColor
-                                            : brand.primaryColor
-                                          : "#E4DED2",
+                                            ? strength === 0
+                                              ? brand.accentColor
+                                              : brand.primaryColor
+                                            : "#E4DED2",
                                     }}
                                   />
                                 ))}
                               </div>
                               <p
                                 className="text-xs"
-                                style={{ color: brand.neutralColor, fontVariantNumeric: "tabular-nums" }}
+                                style={{
+                                  color: brand.neutralColor,
+                                  fontVariantNumeric: "tabular-nums",
+                                }}
                               >
                                 {password.length === 0
                                   ? "8 characters minimum"
@@ -488,16 +521,17 @@ export default function Screen() {
                             id="signup-keep"
                             checked={keepSignedIn}
                             onChange={(e) =>
-                              setKeepSignedIn(
-                                e && e.target ? e.target.checked : !keepSignedIn
-                              )
+                              setKeepSignedIn(e && e.target ? e.target.checked : !keepSignedIn)
                             }
                             onCheckedChange={(v) =>
                               setKeepSignedIn(typeof v === "boolean" ? v : !keepSignedIn)
                             }
                             className="pt-focus mt-0.5"
                           />
-                          <Label htmlFor="signup-keep" className="text-sm font-normal leading-relaxed">
+                          <Label
+                            htmlFor="signup-keep"
+                            className="text-sm font-normal leading-relaxed"
+                          >
                             <span className="font-medium">Keep me signed in on this device</span>
                             <span className="block text-sm" style={{ color: brand.neutralColor }}>
                               Leave this off if you're on a shared or public computer.
@@ -528,11 +562,17 @@ export default function Screen() {
                                   />
                                   <span
                                     className="pt-dot inline-block h-1.5 w-1.5 rounded-full"
-                                    style={{ backgroundColor: brand.backgroundColor, animationDelay: "0.15s" }}
+                                    style={{
+                                      backgroundColor: brand.backgroundColor,
+                                      animationDelay: "0.15s",
+                                    }}
                                   />
                                   <span
                                     className="pt-dot inline-block h-1.5 w-1.5 rounded-full"
-                                    style={{ backgroundColor: brand.backgroundColor, animationDelay: "0.3s" }}
+                                    style={{
+                                      backgroundColor: brand.backgroundColor,
+                                      animationDelay: "0.3s",
+                                    }}
                                   />
                                 </span>
                               </span>
@@ -542,16 +582,12 @@ export default function Screen() {
                               "Create account and start chatting"
                             )}
                           </Button>
-                          <p
-                            className="sr-only"
-                            role="status"
-                            aria-live="polite"
-                          >
+                          <p className="sr-only" role="status" aria-live="polite">
                             {status === "submitting"
                               ? "Creating your account, one moment."
                               : status === "failed"
-                              ? "We couldn't reach the account service. Your details are still in the form."
-                              : ""}
+                                ? "We couldn't reach the account service. Your details are still in the form."
+                                : ""}
                           </p>
                         </div>
                       </div>
@@ -559,7 +595,10 @@ export default function Screen() {
                   </CardContent>
                 </Card>
 
-                <p className="mt-6 max-w-xl text-sm leading-relaxed" style={{ color: brand.neutralColor }}>
+                <p
+                  className="mt-6 max-w-xl text-sm leading-relaxed"
+                  style={{ color: brand.neutralColor }}
+                >
                   Pocket Talk is a prototype. Your conversations are private to your account, kept
                   until you delete them, and never shared or published.{" "}
                   <button
@@ -647,7 +686,10 @@ export default function Screen() {
                           </div>
                           <pre
                             className="overflow-x-auto px-3 py-2.5 text-[0.78rem] leading-relaxed"
-                            style={{ color: "#F3EFE6", fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace" }}
+                            style={{
+                              color: "#F3EFE6",
+                              fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+                            }}
                           >
                             <code>{turn.code}</code>
                           </pre>
