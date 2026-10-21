@@ -10,6 +10,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, Field
 
+from app.security import PASSWORD_MIN_LENGTH
+
 
 class StubResponse(BaseModel):
     """What a generated route returns until someone implements it.
@@ -29,7 +31,10 @@ class StubResponse(BaseModel):
 
 class UserCreate(BaseModel):
     email: EmailStr
-    password: str = Field(min_length=8)
+    password: str = Field(
+        min_length=PASSWORD_MIN_LENGTH,
+        description=f"Must be at least {PASSWORD_MIN_LENGTH} characters.",
+    )
 
 
 class UserOut(BaseModel):
@@ -116,7 +121,7 @@ class ForgotPasswordResponse(BaseModel):
 
 class ResetPasswordRequest(BaseModel):
     token: str
-    new_password: str = Field(min_length=8)
+    new_password: str = Field(min_length=PASSWORD_MIN_LENGTH)
 
 
 class ResetPasswordResponse(BaseModel):

@@ -135,4 +135,29 @@ class PasswordResetToken(Base):
     user: Mapped["User"] = relationship(back_populates="password_reset_tokens")
 
 
-__all__ = ["Base", "Conversation", "GUID", "Message", "PasswordResetToken", "User"]
+class RevokedToken(Base):
+    """Logged-out session JWTs, by `jti`, until they would have expired anyway.
+
+    JWTs are stateless by design, so invalidating one on logout needs a
+    server-side record of which ones no longer count; `get_current_user`
+    checks this table on every request.
+    """
+
+    __tablename__ = "revoked_tokens"
+
+    jti: Mapped[str] = mapped_column(String(36), primary_key=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+
+__all__ = [
+    "Base",
+    "Conversation",
+    "GUID",
+    "Message",
+    "PasswordResetToken",
+    "RevokedToken",
+    "User",
+]
