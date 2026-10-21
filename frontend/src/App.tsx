@@ -1,9 +1,12 @@
+import * as React from "react";
 import { NavLink, Navigate, Outlet, Route, Routes } from "react-router-dom";
 
 import SignIn from "@/screens/SignIn";
 import SignUp from "@/screens/SignUp";
 import ResetPassword from "@/screens/ResetPassword";
 import Chat from "@/screens/Chat";
+import { getToken, signOut } from "@/lib/api";
+import { useNavigate } from "@/lib/navigate";
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   [
@@ -14,6 +17,13 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 // The screens behind sign-in render inside the side menu. Login and the other
 // screens shown before sign-in render on their own, with no menu around them.
 function Shell() {
+  const navigate = useNavigate();
+
+  async function handleSignOut() {
+    await signOut();
+    navigate("sign-in");
+  }
+
   return (
     <div className="flex min-h-screen">
       <aside
@@ -37,12 +47,27 @@ function Shell() {
             {"Chat"}
           </NavLink>
         </nav>
+        <button
+          type="button"
+          onClick={handleSignOut}
+          className="mt-4 block rounded-[var(--brand-radius)] px-3 py-2 text-left text-sm font-medium text-[var(--brand-fg-muted)] transition-colors hover:bg-[var(--brand-hover)] hover:text-[var(--brand-fg)]"
+        >
+          {"Sign out"}
+        </button>
       </aside>
       <main className="flex-1 overflow-auto">
         <Outlet />
       </main>
     </div>
   );
+}
+
+/** Redirect to /sign-in when there is no stored session token. */
+function RequireAuth({ children }: { children: React.ReactNode }) {
+  if (!getToken()) {
+    return <Navigate to="/sign-in" replace />;
+  }
+  return <>{children}</>;
 }
 
 export default function App() {
@@ -52,7 +77,14 @@ export default function App() {
       <Route path="/sign-up" element={<SignUp />} />
       <Route element={<Shell />}>
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/chat" element={<Chat />} />
+        <Route
+          path="/chat"
+          element={
+            <RequireAuth>
+              <Chat />
+            </RequireAuth>
+          }
+        />
       </Route>
       <Route path="*" element={<Navigate to="/sign-in" replace />} />
     </Routes>

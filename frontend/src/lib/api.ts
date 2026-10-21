@@ -7,10 +7,6 @@
 //
 // Set at build time: the platform bakes the deployed API URL into the frontend build. The
 // fallback is the local backend so a bare `npm run dev` still points somewhere real.
-//
-// The generated screens do NOT use this yet -- they render seeded sample data, exactly as
-// they were approved. This is the seam to replace that with real calls, one screen at a
-// time.
 
 /** Type aliases for the request and response bodies the API spec declares. */
 export interface UserPublic {
@@ -61,6 +57,32 @@ export function clearToken(): void {
   localStorage.removeItem(TOKEN_KEY);
 }
 
+/**
+ * Thrown by {@link apiFetch} when the server returns a non-2xx status.
+ * Carries the HTTP status code and the parsed response body (if any) so
+ * callers can branch on specific error conditions (409 conflict, 422
+ * validation, 401 unauthorised, etc.).
+ */
+export class ApiError extends Error {
+  status: number;
+  body: unknown;
+
+  constructor(status: number, body: unknown, message: string) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.body = body;
+  }
+}
+
+/**
+ * Paths where a 401 means "wrong credentials" rather than "expired session".
+ * On these screens the 401 should be surfaced to the caller so it can show
+ * an inline message — not trigger a redirect to the very page the user is
+ * already on.
+ */
+const AUTH_PATHS = new Set(["/sign-in", "/sign-up"]);
+
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const token = getToken();
   const response = await fetch(`${API_BASE_URL}${path}`, {
@@ -71,8 +93,50 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
       ...(init?.headers ?? {}),
     },
   });
+
   if (!response.ok) {
-    throw new Error(`${init?.method ?? "GET"} ${path} failed: ${response.status}`);
+    let body: unknown = undefined;
+    try {
+      body = await response.json();
+    } catch {
+      // Response body was not JSON — leave body undefined.
+    }
+
+    // An authenticated request that comes back 401 means the token is
+    // invalid or expired. Clear it and send the user back to sign-in —
+    // but only when they are not already on a sign-in / sign-up screen,
+    // where a 401 means "wrong credentials" and should show an inline
+    // error instead of redirecting in a loop.
+    if (response.status === 401 && token && typeof window !== "undefined") {
+      const pathname = window.location.pathname;
+      if (!AUTH_PATHS.has(pathname)) {
+        clearToken();
+        window.location.assign("/sign-in");
+      }
+    }
+
+    throw new ApiError(
+      response.status,
+      body,
+      `${init?.method ?? "GET"} ${path} failed: ${response.status}`,
+    );
   }
+
   return response.status === 204 ? (undefined as T) : ((await response.json()) as T);
+}
+
+/**
+ * Sign the current user out: notify the server, then clear the stored JWT.
+ * The caller is responsible for navigating to /sign-in afterwards (e.g.
+ * via the router's `useNavigate`), so that the transition stays within
+ * the SPA.
+ */
+export async function signOut(): Promise<void> {
+  try {
+    await apiFetch("/auth/logout", { method: "POST" });
+  } catch {
+    // The server may be unreachable or the token expired — clear
+    // locally regardless so the user is signed out on this device.
+  }
+  clearToken();
 }

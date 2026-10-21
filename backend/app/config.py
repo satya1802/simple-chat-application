@@ -9,6 +9,10 @@ Service keys (``OPENAI_API_KEY``, ``SENDGRID_API_KEY``) are NOT read here --
 the architecture says each feature reads its own key at the point of use and
 turns itself off with a clear message when the key is empty, so the app never
 fails at startup over a missing key. ``services.py`` reports which are set.
+
+``JWT_SECRET`` is the one exception: a session-token secret with no safe
+default, so the app refuses to start when it is missing rather than silently
+signing tokens with a guessable value.
 """
 
 import os
@@ -21,10 +25,15 @@ DAILY_MESSAGE_CAP = int(os.getenv("DAILY_MESSAGE_CAP", "50"))
 # rejects empty titles and anything past the max.
 MAX_TITLE_LENGTH = 120
 
-# JWT session tokens. The secret must be set in deployment; the default lets a
-# fresh clone start so tests can run, but a production deployment that leaves
-# it at the default is insecure.
-JWT_SECRET = os.getenv("JWT_SECRET", "dev-insecure-secret-change-me")
+# JWT session tokens. The secret MUST be set in every environment; there is no
+# safe default, so a missing value is a startup error rather than a silent
+# security hole.
+JWT_SECRET = os.getenv("JWT_SECRET")
+if not JWT_SECRET:
+    raise RuntimeError(
+        "JWT_SECRET must be set in the environment -- refusing to start "
+        "without a session-token secret."
+    )
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRE_MINUTES = int(os.getenv("JWT_EXPIRE_MINUTES", str(60 * 24 * 7)))  # 7 days
 

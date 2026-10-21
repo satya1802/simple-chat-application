@@ -18,6 +18,9 @@ ruff>=0.6
 email-validator>=2.1
 openai>=1.40
 passlib[bcrypt]>=1.7.4
+# passlib 1.7.4 is incompatible with bcrypt >= 5 (bcrypt removed
+# ``__about__.__version__``); pin bcrypt to the last 4.x release.
+bcrypt==4.2.1
 python-jose[cryptography]>=3.3
 redis>=5.0
 sendgrid>=6.11
