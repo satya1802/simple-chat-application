@@ -52,6 +52,4 @@ def test_app_fails_fast_when_openai_api_key_is_empty_string():
 def test_app_imports_cleanly_when_openai_api_key_is_set():
     result = _run_import_with_env("sk-a-plausible-looking-test-key")
 
-    assert result.returncode == 0, (
-        f"stdout={result.stdout!r} stderr={result.stderr!r}"
-    )
+    assert result.returncode == 0, f"stdout={result.stdout!r} stderr={result.stderr!r}"

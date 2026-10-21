@@ -86,7 +86,9 @@ describe("SignUp", () => {
       vi.fn().mockReturnValue(
         jsonResponse(
           {
-            detail: [{ loc: ["body", "password"], msg: "ensure this value has at least 8 characters" }],
+            detail: [
+              { loc: ["body", "password"], msg: "ensure this value has at least 8 characters" },
+            ],
           },
           422,
         ),
@@ -116,7 +118,9 @@ describe("SignUp", () => {
     await user.type(screen.getByLabelText(/^password$/i), "s3cret123");
     await user.click(screen.getByRole("button", { name: /create account and start chatting/i }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(/couldn't reach the account service/i);
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      /couldn't reach the account service/i,
+    );
     expect(screen.getByLabelText(/email address/i)).toHaveValue("ok@example.com");
   });
 });

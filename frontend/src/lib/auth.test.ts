@@ -27,10 +27,7 @@ describe("auth session storage", () => {
   });
 
   it("registerAccount stores the returned token and user, never the password", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockReturnValue(jsonResponse({ token: "tok-1", user: USER })),
-    );
+    vi.stubGlobal("fetch", vi.fn().mockReturnValue(jsonResponse({ token: "tok-1", user: USER })));
 
     const session = await registerAccount("mara@example.com", "s3cret123");
 
@@ -42,10 +39,7 @@ describe("auth session storage", () => {
   });
 
   it("login stores the session on success", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockReturnValue(jsonResponse({ token: "tok-2", user: USER })),
-    );
+    vi.stubGlobal("fetch", vi.fn().mockReturnValue(jsonResponse({ token: "tok-2", user: USER })));
 
     const session = await login("mara@example.com", "s3cret123");
     expect(getSession()).toEqual(session);
@@ -59,10 +53,7 @@ describe("auth session storage", () => {
   });
 
   it("logout calls the API and clears the stored session even if the call fails", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockReturnValue(jsonResponse({ token: "tok-3", user: USER })),
-    );
+    vi.stubGlobal("fetch", vi.fn().mockReturnValue(jsonResponse({ token: "tok-3", user: USER })));
     await login("mara@example.com", "s3cret123");
     expect(getSession()).not.toBeNull();
 

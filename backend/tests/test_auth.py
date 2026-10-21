@@ -38,7 +38,9 @@ def test_register_success_returns_session_and_stores_bcrypt_hash(client, db_sess
     )
 
 
-def test_register_duplicate_email_is_rejected_with_field_error_and_no_new_row(client, db_session, unique_email):
+def test_register_duplicate_email_is_rejected_with_field_error_and_no_new_row(
+    client, db_session, unique_email
+):
     first = _register(client, unique_email)
     assert first.status_code in (200, 201), first.text
 
@@ -82,7 +84,9 @@ def test_login_success_returns_session(client, unique_email):
     assert response.json().get("token")
 
 
-def test_login_unknown_email_and_wrong_password_return_identical_generic_error(client, unique_email):
+def test_login_unknown_email_and_wrong_password_return_identical_generic_error(
+    client, unique_email
+):
     _register(client, unique_email)
 
     unknown = client.post(

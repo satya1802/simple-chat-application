@@ -111,9 +111,7 @@ async def send_message(
         db.query(Message).filter(Message.conversation_id == conversation.id).count() == 0
     )
 
-    user_message = Message(
-        conversation_id=conversation.id, role="user", content=body.content
-    )
+    user_message = Message(conversation_id=conversation.id, role="user", content=body.content)
     db.add(user_message)
 
     if is_first_message:

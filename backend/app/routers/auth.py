@@ -34,9 +34,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.post("/register", response_model=AuthResponse, status_code=status.HTTP_201_CREATED)
-async def register(
-    body: RegisterRequest, db: Annotated[Session, Depends(get_db)]
-) -> AuthResponse:
+async def register(body: RegisterRequest, db: Annotated[Session, Depends(get_db)]) -> AuthResponse:
     existing = db.query(User).filter(User.email == body.email).first()
     if existing is not None:
         raise HTTPException(

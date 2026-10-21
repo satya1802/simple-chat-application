@@ -1,5 +1,12 @@
 import type { ReactElement } from "react";
-import { NavLink, Navigate, Outlet, Route, Routes, useNavigate as useRouterNavigate } from "react-router-dom";
+import {
+  NavLink,
+  Navigate,
+  Outlet,
+  Route,
+  Routes,
+  useNavigate as useRouterNavigate,
+} from "react-router-dom";
 
 import SignIn from "@/screens/SignIn";
 import SignUp from "@/screens/SignUp";
