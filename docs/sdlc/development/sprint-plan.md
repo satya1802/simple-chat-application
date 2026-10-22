@@ -7,7 +7,7 @@
 
 Stand up account registration/sign-in, LLM provider configuration, and the ability to start a conversation
 
-Capacity: 20 points · Committed: 18
+Capacity: 20 points · Committed: 20
 
 | Key | Type | Title | Points | Role | Depends on |
 |---|---|---|---|---|---|
@@ -37,6 +37,7 @@ Capacity: 20 points · Committed: 18
 | ↳ US-018-T1 | Task | Add configurable system prompt | — | backend-agent | — |
 | ↳ US-018-T2 | Task | Inject prompt into every LLM request | — | backend-agent | — |
 | ↳ US-018-T3 | Task | Keep prompt hidden from end users | — | frontend-agent | — |
+| US-020 | Story | Move Sign out into the left navigation under Chat | 2 | frontend-agent | — |
 
 ## Sprint 2: Sprint 2
 

@@ -5,61 +5,253 @@
 <!-- sdlc:auto:start narrative -->
 ## Summary
 
-### REQ-000 · approved · source: requirements:tech_stack_and_scope
+### REQ-TECH-STACK · approved · source: requirements:tech-stack
 
-Product owner approved an exact technology stack and service set for a lightweight prototype chat app, plus an explicit in-scope/out-of-scope capability list.
+Technology stack is fixed and explicitly approved by the product owner: FastAPI 0.115 backend, AWS cloud, PostgreSQL 16, React 19 frontend.
 
-Delivery scope: lightweight. Requirements version: 1. Approved stack (design against exactly these, no substitution): Backend FastAPI 0.115 (chosen over an originally-requested Node backend because this platform builds Python backends; justified by native token streaming and the official OpenAI Python library); Cloud AWS (managed hosting, one small container each for API/web plus small managed Postgres, keeps DB/secrets/logs in one account); Database PostgreSQL 16 (fits simple user/conversation/message relational queries, supports per-account isolation and daily message counting); Frontend React 19. Runtime services: OpenAI (SaaS, OPENAI_API_KEY) for all assistant answers; Redis (container redis:7-alpine) for per-account daily message counters; SendGrid (SaaS, SENDGRID_API_KEY) for the single password-reset email. Required API keys: OPENAI_API_KEY, REDIS_URL, SENDGRID_API_KEY. Out of scope: user-to-user messaging, RAG/document upload, integration with existing company systems, native mobile apps, voice input/output, image generation, file/image attachments. In-scope capabilities: streamed token-by-token answers, chat composer with running thread, in-conversation memory, multiple saved conversations listed newest-first, new/rename/delete conversation, reloaded history, public self-registration/sign-in, per-account data isolation, formatted markdown/code rendering, mobile-responsive layout, setup/run instructions, OpenAI-hosted model answers, email+password auth with no verification/Google sign-in, operator-changeable neutral system prompt, no sharing/export/public links, chronological-only conversation list, indefinite history retention until user deletion, English-only UI.
+Approved stack: Backend FastAPI 0.115 (rationale given: original note requested Node, but platform builds Python backends so FastAPI was substituted as the closest equivalent; supports native token streaming from OpenAI and standard CRUD/auth endpoints). Cloud: AWS (requested managed cloud hosting; supports small containers for API and web app plus managed Postgres, keeps DB/secrets/logs in one account). Database: PostgreSQL 16 (matches original assumption; fits relational user/conversation/message model and per-day message counting). Frontend: React 19 (as specified). Note: the backend language was changed from the requester's original Node preference to FastAPI/Python by platform constraint -- this is a documented substitution with rationale, not an unresolved conflict.
 
-**Related:** EPIC-001, EPIC-002, EPIC-003, EPIC-004, EPIC-005
+**Related:** US-001, US-017, US-019
 
-### REQ-EPIC-001 · approved · source: requirements:EPIC-001
+### REQ-SERVICES · approved · source: requirements:services
 
-Public self-service sign-up/sign-in with strict per-account data isolation; no email verification, no social login, no sharing/export in this release.
+Three runtime services are approved and required: OpenAI (LLM), Redis (daily usage counters), SendGrid (password-reset email).
 
-Assumptions: email+password sign-up with password-reset-only recovery (no verification, no Google sign-in); no transactional email beyond password reset; prototype-grade data handling (hashed passwords, HTTPS, scoped queries) with no formal compliance program; app is free, no billing (future monetisation assumed to be monthly Stripe subscription, STRIPE_SECRET_KEY, not built now). Stories: US-001 [critical] Self-register with email/password — account created with salted-hash password, auto sign-in, inline validation errors (AC-001, AC-002). US-002 [critical] Sign in/out — authenticated session, generic invalid-credential message, sign-out invalidates session and redirects (AC-003–AC-005). US-003 [high] Reset forgotten password — single-use time-limited reset link via email, enumeration-safe confirmation, invalid/expired link handling (AC-006–AC-008). US-004 [critical] See only my own conversations — list/endpoint scoping by owner, forbidden/not-found on cross-account access, unauthenticated redirect, no share/export/public-link controls anywhere (AC-009–AC-012).
+Approved services and required API keys: AI provider OpenAI, SaaS, env OPENAI_API_KEY -- generates all assistant answers, model/provider swappable later. Cache: Redis, container redis:7-alpine -- holds per-account daily message counters to enforce the message cap instantly (supports US-009). Email: SendGrid, SaaS, env SENDGRID_API_KEY -- delivers the single transactional email (password reset) to external inboxes (supports US-003). Full required API key list: OPENAI_API_KEY, REDIS_URL, SENDGRID_API_KEY.
 
-**Related:** US-001, US-002, US-003, US-004
+**Related:** US-009, US-003, US-017
 
-### REQ-EPIC-002 · approved · source: requirements:EPIC-002
+### REQ-SCOPE · approved · source: requirements:scope
 
-Core AI chat: token-streamed OpenAI answers, composer/thread UI, in-conversation memory, sanitised markdown/code rendering, and a server-enforced daily message cap.
+Delivery scope is 'lightweight', requirements version 2. In-scope capabilities and explicit out-of-scope exclusions are both enumerated.
 
-Assumptions: OpenAI hosted LLM (swappable), neutral default system prompt, memory scoped to a single conversation only (no cross-conversation or long-term memory), operator-configurable daily per-account cap with an as-yet-undecided limit, markdown-only rendering with no tool/function calling. Stories: US-005 [critical] Ask a question, get streamed answer — immediate user message display, incremental token rendering, persistence on completion, send-blocking during stream, plain-English error handling with retry (AC-013–AC-016). US-006 [critical] Composer and thread — chronological ordering, auto-growing composer, empty/whitespace guard, auto-scroll (AC-017–AC-020). US-007 [critical] Remembers earlier turns — prior messages sent as context, strict per-conversation isolation, oldest-message trimming when context window exceeded (AC-021–AC-023). US-008 [high] Formatted text/code blocks — sanitised markdown rendering, monospaced code blocks with copy control, HTML/script sanitisation, graceful partial-markdown rendering mid-stream (AC-024–AC-027). US-009 [high] Daily message cap — server-side pre-LLM-call rejection at cap, clear reset-time message, cap enforced even on direct API calls, operator-configurable via config with documented default (AC-028–AC-031).
+In scope: streamed token-by-token Q&A, chat composer with running thread, same-conversation memory, multiple saved conversations listed newest-first, new/rename/delete conversation, persisted history reload, public self-registration and sign-in (email+password, no verification, no Google sign-in), per-account data isolation, markdown+code-block rendering, mobile-responsive layout, setup/run instructions, OpenAI-hosted model answers, operator-changeable neutral system prompt, no sharing/export/public links, chronological-only conversation list (no search/folders/favourites), indefinite history retention until user deletion, English-only UI. Out of scope (explicitly excluded, not to be designed or built): user-to-user messaging/DMs/group chat/presence, document upload with RAG+citations, integration with existing company systems as AI knowledge source, native mobile apps (mobile-responsive web instead), voice input/output, image generation, file/image attachments in chat.
+
+**Related:** US-001, US-004, US-005, US-010, US-015, US-016
+
+### EPIC-001 · draft · source: requirements:EPIC-001
+
+Account Access and Private Data Isolation: public self-service sign-up/sign-in with each account restricted to its own conversations.
+
+Covers self-registration (US-001), sign-in/sign-out (US-002), password reset via email (US-003), strict per-account data isolation with no sharing/export (US-004), and relocating Sign out into left navigation under Chat (US-020). Carried assumptions: email+password sign-up only (no verification, no Google sign-in); no transactional email beyond password reset; prototype-grade data handling (hashed passwords, HTTPS, scoped queries) -- no GDPR/HIPAA/SOC2 program; app is free with no payments in this release (future monetisation assumed to be monthly Stripe subscription via STRIPE_SECRET_KEY, not built now).
+
+**Related:** US-001, US-002, US-003, US-004, US-020
+
+- ⚠ Password minimum length is referenced in multiple ACs (AC-001, AC-002, AC-007) as 'the stated minimum length' but the actual numeric value is not given in this input.
+
+### US-001 · draft · source: requirements:US-001
+
+Visitors can self-register with email and password, critical priority. Successful sign-up auto-signs-in to an empty chat screen with no email verification; failures show inline field-specific English errors.
+
+AC-001: Valid unused email + password meeting minimum length creates an account (password stored as salted hash), auto-signs-in, lands on empty chat screen, no verification step. AC-002: Duplicate email, malformed email, or under-length password rejects the submission, shows inline English error naming the offending field, retains entered email.
+
+**Related:** EPIC-001, AC-001, AC-002
+
+- ⚠ Minimum password length value not specified in input.
+
+### US-002 · draft · source: requirements:US-002
+
+Registered users can sign in and sign out, critical priority, to access and protect their saved conversations.
+
+AC-003: Correct email/password establishes an authenticated session and lands on chat screen with sidebar populated. AC-004: Incorrect credentials show one generic 'Email or password is incorrect' message that does not reveal account existence. AC-005: Sign out invalidates the session; subsequent chat-screen access redirects to sign-in.
+
+**Related:** EPIC-001, AC-003, AC-004, AC-005
+
+### US-003 · draft · source: requirements:US-003
+
+Registered users can reset a forgotten password via a single-use, time-limited emailed link, high priority.
+
+AC-006: Submitting an email on 'Forgot password' always shows a generic confirmation (does not reveal whether account exists); a reset email is sent only if the account exists, containing a single-use, time-limited link. AC-007: Opening a valid unexpired link and submitting a new password meeting minimum length updates the password, invalidates the link, allows sign-in with new password. AC-008: An already-used or expired link shows an English 'no longer valid' message with an option to request a new one; no password changed.
+
+**Related:** EPIC-001, AC-006, AC-007, AC-008
+
+- ⚠ Reset link expiry duration and password minimum length values not specified.
+
+### US-004 · draft · source: requirements:US-004
+
+Critical data-isolation requirement: each signed-in account sees and can act only on its own conversations/messages; unauthenticated access is blocked; no sharing/export/public-link controls exist.
+
+AC-009: Conversation list/chat screen returns only the requesting account's conversations. AC-010: Any cross-account request (read/rename/delete/post) against another user's conversation id returns not-found/forbidden and makes no change. AC-011: Unauthenticated direct access to any chat/conversation/message screen or endpoint is refused and redirected to sign-in, no content returned. AC-012: No share, publish, public-link, or export control exists anywhere in the UI.
+
+**Related:** EPIC-001, AC-009, AC-010, AC-011, AC-012
+
+### US-020 · draft · source: requirements:US-020
+
+Low-priority UI change: move Sign out from the bottom of the 'Your chats' panel into the left navigation, nested under Chat.
+
+AC-067: Sign out control removed from the bottom of the 'Your chats' panel. AC-068: Left navigation gains a 'Sign out' menu item nested under 'Chat'. AC-069: Selecting Sign out from the nav invalidates the session and redirects to sign-in, matching existing behaviour (per US-002/AC-005). AC-070: On small/mobile viewports with collapsed navigation, expanding the menu and Chat section makes Sign out reachable with the same behaviour.
+
+**Related:** EPIC-001, US-002, AC-067, AC-068, AC-069, AC-070
+
+### EPIC-002 · draft · source: requirements:EPIC-002
+
+AI Chat with Streamed Answers: core product loop of streamed token-by-token replies with in-conversation memory.
+
+Covers streamed Q&A (US-005), composer and thread UI (US-006), same-conversation memory with context trimming (US-007), markdown/code rendering (US-008), and a server-side daily message cap (US-009). Carried assumptions: hosted LLM via OpenAI by default, OPENAI_API_KEY required, provider/model swappable; neutral helpful general-assistant system prompt (no custom persona specified); memory limited to a single conversation via prior-message context, no cross-conversation or long-term memory; daily per-account message cap exists but exact limit not yet set and is operator-configurable; responses render as formatted markdown text only, no interactive widgets, no tool/function calling.
 
 **Related:** US-005, US-006, US-007, US-008, US-009
 
-- ⚠ Exact daily message cap numeric value is an open assumption not yet decided (per AC-031); requirements defer it to operator configuration at deploy time.
+- ⚠ Exact daily message cap value not yet decided (explicitly an open assumption per AC-031). System prompt default text content not specified beyond 'neutral, helpful general-assistant'. Model context-window trim size/strategy details not specified beyond 'configured context limit'.
 
-### REQ-EPIC-003 · approved · source: requirements:EPIC-003
+### US-005 · draft · source: requirements:US-005
 
-Multiple private, saved conversations per account: create, browse newest-first, reopen with full history, rename, delete — chronological list only, indefinite retention.
+Critical: user sends a message and watches the assistant's answer stream in token-by-token.
 
-Assumptions: chronological-only list (no search/folders/tags/pins); indefinite retention until user deletes conversation or account; conversations private with no sharing/export/public links. Stories: US-010 [critical] Start new conversation — empty thread with focused composer, no cross-conversation context, persisted with auto-title only after first message, no orphaned empty conversations left behind (AC-032–AC-034). US-011 [critical] Sidebar browsing — newest-activity-first ordering, re-ordering on new activity, friendly empty state, no search/folder/tag/pin controls (AC-035–AC-038). US-012 [critical] Reopen conversation/history — chronological reload, scroll to latest, highlighted selection, persistence across sessions/browsers, reloaded history used as context for new messages (AC-039–AC-041). US-013 [medium] Rename conversation — inline rename, empty-title rejection, cancel/escape no-op, max-length truncation in sidebar (AC-042–AC-045). US-014 [high] Delete conversation — confirm-to-delete cascading removal, cancel preserves conversation, view switches to next-most-recent or empty state after deleting the open conversation, no auto-purge otherwise (AC-046–AC-049).
+AC-013: Sending shows the user message immediately, clears composer, assistant reply renders incrementally as tokens arrive. AC-014: On stream completion, full assistant message is persisted and composer re-enabled. AC-015: While streaming, sending another message is prevented or queued so replies cannot interleave. AC-016: On LLM error/timeout/broken stream, a plain English error message is shown in place of or appended to the partial reply; user's own message remains saved; retry is possible without losing the conversation.
+
+**Related:** EPIC-002, AC-013, AC-014, AC-015, AC-016
+
+### US-006 · draft · source: requirements:US-006
+
+Critical: composer below a scrolling message thread, with growth, empty-message prevention, and auto-scroll.
+
+AC-017: Messages render chronologically oldest-to-top, user/assistant visually distinguished, view scrolled to newest. AC-018: Composer grows with multi-line text up to a max height then scrolls internally; Send stays reachable. AC-019: Empty or whitespace-only composer content is not sent and adds no message. AC-020: While streaming and user has not scrolled away, thread auto-scrolls to keep latest content in view.
+
+**Related:** EPIC-002, AC-017, AC-018, AC-019, AC-020
+
+### US-007 · draft · source: requirements:US-007
+
+Critical: assistant retains memory of earlier turns within the same conversation only, with context trimmed to fit model limits.
+
+AC-021: Follow-up referring to earlier turns in the open conversation includes prior messages as LLM context and resolves correctly. AC-022: Memory does not cross conversations -- a different open conversation sends no context from another conversation. AC-023: When a conversation exceeds the model's context window, server trims oldest prior messages, still sends system prompt plus most recent turns, and the request succeeds.
+
+**Related:** EPIC-002, AC-021, AC-022, AC-023
+
+- ⚠ Exact context-window size / trim threshold not specified.
+
+### US-008 · draft · source: requirements:US-008
+
+High priority: assistant replies render as formatted markdown text, including safe, copyable code blocks, even mid-stream.
+
+AC-024: Markdown headings/bold/lists/links render as formatted text, not raw markup. AC-025: Fenced code blocks render monospaced with preserved whitespace and a copy-to-clipboard control; surrounding prose renders normally. AC-026: HTML/script-like content in replies is sanitised and shown as inert text -- no injected markup/script executes. AC-027: Partial/incomplete markdown mid-stream renders without crashing the view and resolves to correct formatting once the stream completes.
+
+**Related:** EPIC-002, AC-024, AC-025, AC-026, AC-027
+
+### US-009 · draft · source: requirements:US-009
+
+High priority, operator-facing: a configurable server-side daily message cap per account, backed by Redis, to bound LLM cost.
+
+AC-028: Under the cap, a message is accepted, assistant replies, daily usage count increments. AC-029: At the cap, the server rejects the request before calling the LLM and the chat screen shows an English message stating the limit was reached and when it resets. AC-030: The limit is enforced server-side even for direct requests to the message endpoint bypassing the UI. AC-031: The exact limit is an open assumption, set via operator configuration at deploy time, takes effect without a code change, and the deployed default must be documented in setup instructions.
+
+**Related:** EPIC-002, AC-028, AC-029, AC-030, AC-031, REQ-SERVICES
+
+- ⚠ Exact numeric daily message cap default not yet decided -- explicitly deferred to operator configuration at deployment (AC-031).
+
+### EPIC-003 · draft · source: requirements:EPIC-003
+
+Saved Conversations: multiple conversations per account, newest-first sidebar, with create/reopen/rename/delete.
+
+Covers new conversation creation (US-010), newest-first sidebar listing (US-011), reopening with full saved history (US-012), renaming (US-013), and deleting (US-014). Carried assumptions: chronological-only list, no search/folders/tags/favourites in this release; indefinite retention until user or account deletion, no automatic retention cut-off; conversations private to owner, no sharing/export/public links.
 
 **Related:** US-010, US-011, US-012, US-013, US-014
 
-### REQ-EPIC-004 · approved · source: requirements:EPIC-004
+### US-010 · draft · source: requirements:US-010
 
-Single responsive React web app replacing native mobile apps, English-only interface.
+Critical: user can start a fresh conversation at any time without carrying over prior context.
 
-Assumptions: English-only UI, no localisation; native iOS/Android explicitly out of scope, mobile delivered via responsive web. Stories: US-015 [high] Use chat on a phone — no horizontal scroll at ~375px width, sidebar collapses behind a menu, composer/messages stay visible above on-screen keyboard, desktop shows permanent sidebar (AC-050–AC-053). US-016 [low] Consistent English-only interface — all UI/errors/emails in English, no language picker, graceful handling of non-English browser locale (AC-054, AC-055).
+AC-032: 'New chat' opens an empty thread, composer focused, no prior messages/context from other conversations. AC-033: Sending the first message in a new conversation persists it, places it at the top of the sidebar, with an auto-generated title derived from that first message. AC-034: An opened-but-never-messaged new chat leaves no empty conversation behind on navigate-away or sign-out.
+
+**Related:** EPIC-003, AC-032, AC-033, AC-034
+
+### US-011 · draft · source: requirements:US-011
+
+Critical: sidebar lists only the signed-in user's conversations, most-recently-active first, with a friendly empty state and no search/folder/tag/pin controls.
+
+AC-035: Sidebar lists only the user's own conversations, ordered by most recent activity, each showing its title. AC-036: A message exchange in an older conversation moves it to the top of the list. AC-037: Zero conversations shows a friendly empty state inviting a new chat, not an error or blank panel. AC-038: Per open assumption, the sidebar has no search box, folder tree, tag control, or pin/favourite action.
+
+**Related:** EPIC-003, AC-035, AC-036, AC-037, AC-038
+
+### US-012 · draft · source: requirements:US-012
+
+Critical: reopening a conversation reloads its full saved history server-side, persisting across sessions/devices.
+
+AC-039: Selecting a conversation loads its messages chronologically, scrolls to latest, highlights it in the sidebar. AC-040: History persists server-side -- reopening the same conversation after sign-out/sign-in on a different browser session shows identical history. AC-041: Continuing an older conversation includes the reloaded prior messages as context for the assistant's next reply.
+
+**Related:** EPIC-003, AC-039, AC-040, AC-041
+
+### US-013 · draft · source: requirements:US-013
+
+Medium priority: user can rename a conversation to a custom title, with validation and a maximum length.
+
+AC-042: Rename with a non-empty title saves it and updates sidebar and header immediately. AC-043: Empty/whitespace-only title is rejected with an inline message; previous title kept. AC-044: Escape or Cancel leaves the title unchanged. AC-045: Titles beyond the allowed maximum length are stored truncated to that maximum and visually truncated in the sidebar without breaking layout.
+
+**Related:** EPIC-003, AC-042, AC-043, AC-044, AC-045
+
+- ⚠ Maximum title length value not specified in input.
+
+### US-014 · draft · source: requirements:US-014
+
+High priority: user can delete an owned conversation permanently, with confirmation and indefinite retention otherwise.
+
+AC-046: Confirmed delete removes the conversation and all its messages from the account and from the sidebar. AC-047: Cancelling the confirmation deletes nothing; conversation remains. AC-048: Deleting the currently open conversation switches the view to the next most recent conversation, or to an empty new-chat state if none remain. AC-049: Per open assumption, conversations are retained indefinitely and never auto-purged absent user deletion.
+
+**Related:** EPIC-003, AC-046, AC-047, AC-048, AC-049
+
+### EPIC-004 · draft · source: requirements:EPIC-004
+
+Responsive Web Experience: single English-only responsive web app for phone and desktop, replacing native mobile apps.
+
+Covers mobile-responsive layout (US-015) and English-only consistent interface (US-016). Carried assumptions: English-language UI only, no localisation; native iOS/Android apps explicitly out of scope, mobile support via responsive web layout only.
 
 **Related:** US-015, US-016
 
-### REQ-EPIC-005 · approved · source: requirements:EPIC-005
+### US-015 · draft · source: requirements:US-015
 
-Operator-facing configuration, credentials, system prompt, and setup/run documentation needed to stand up and operate the prototype.
+High priority: chat layout adapts to small screens with a collapsible sidebar, and remains usable with the on-screen keyboard open.
 
-Assumptions: OpenAI is the default/required LLM provider (OPENAI_API_KEY required, model/provider swappable); no admin dashboard, analytics, or moderation console — operator uses DB and LLM provider dashboard directly; no payments in this release (future Stripe subscription assumed only); single managed deployment, no horizontal scaling, no SLA, no formal compliance program. Stories: US-017 [critical] Configure hosted LLM provider — env-driven API key and model name, fail-fast startup error if key missing, server-side-only key handling (never exposed client-side/logs), model swap via config+restart with no code change (AC-056–AC-059). US-018 [medium] Configure system prompt — default neutral prompt, operator override via config, prompt not shown/editable in UI (AC-060–AC-062). US-019 [high] Setup/run documentation — README covering prerequisites, install/migrate/run/register/chat walkthrough, full env var list with example env file, deployment section noting single-instance limitations (no horizontal scaling, no SLA, no compliance regime, no admin dashboard/analytics), and explicit no-billing statement with future Stripe assumption (AC-063–AC-066).
+AC-050: At ~375px viewport, thread and composer fill the width with no horizontal scroll; sidebar collapses behind a menu control. AC-051: Opening the menu and selecting a conversation closes the sidebar and displays that thread. AC-052: With the on-screen keyboard open, composer and latest messages remain visible above it. AC-053: On desktop viewport, sidebar is shown permanently alongside the thread with the same conversations/history available.
+
+**Related:** EPIC-004, AC-050, AC-051, AC-052, AC-053
+
+### US-016 · draft · source: requirements:US-016
+
+Low priority: all interface text, errors, and the password-reset email are English-only, with no language picker.
+
+AC-054: Every screen, validation message, empty state, error message, and the password-reset email is in English; no language picker or localisation control offered. AC-055: A non-English browser language preference still loads the English interface without error, not untranslated placeholders.
+
+**Related:** EPIC-004, AC-054, AC-055
+
+### EPIC-005 · draft · source: requirements:EPIC-005
+
+Prototype Setup and Operation: operator configuration for the LLM provider, system prompt, and setup/run documentation.
+
+Covers LLM provider configuration (US-017), system prompt configuration (US-018), and setup/run README (US-019). Carried assumptions: OpenAI is default hosted LLM provider, OPENAI_API_KEY required, provider/model swappable; no admin dashboard, usage analytics, or moderation console -- operator manages via database and LLM provider dashboard; no payments in this release, future monetisation assumed to be monthly Stripe subscription (STRIPE_SECRET_KEY) but not built now; prototype-grade single managed deployment, no horizontal scaling, no SLA, no GDPR/HIPAA/SOC2 compliance work beyond basic data handling.
 
 **Related:** US-017, US-018, US-019
+
+### US-017 · draft · source: requirements:US-017
+
+Critical, operator-facing: LLM credential and model name are supplied via configuration, with fail-fast startup checks and server-side-only secret handling.
+
+AC-056: With OPENAI_API_KEY and a model name set, messages are answered by the configured OpenAI model and streamed to the browser. AC-057: Missing/empty OPENAI_API_KEY causes startup to fail fast with a clearly identified fatal error naming the missing variable, not a silent failure on first message. AC-058: The key is read server-side only, never exposed in browser bundle, client responses, or logs. AC-059: Changing the configured model and restarting serves answers from the new model with no code change.
+
+**Related:** EPIC-005, AC-056, AC-057, AC-058, AC-059, REQ-SERVICES
+
+### US-018 · draft · source: requirements:US-018
+
+Medium priority, operator-facing: the assistant's system prompt defaults to neutral/helpful and is operator-configurable, hidden from end users.
+
+AC-060: With no custom prompt configured, requests include a default neutral, helpful general-assistant system prompt. AC-061: A custom operator-configured prompt replaces the default for all conversations after restart. AC-062: The system prompt text is not displayed in the chat screen and is not editable by end users.
+
+**Related:** EPIC-005, AC-060, AC-061, AC-062
+
+- ⚠ Exact default system prompt wording is not specified, only described as 'neutral, helpful general-assistant.'
+
+### US-019 · draft · source: requirements:US-019
+
+High priority: a README must let a developer/operator set up, configure, and deploy the prototype end to end without the original author.
+
+AC-063: Following README setup steps on a clean machine with documented prerequisites allows installing dependencies, creating/migrating the Postgres schema (users, conversations, messages), starting the app, registering an account, and receiving a streamed answer. AC-064: README lists every required environment variable with purpose and example, including OPENAI_API_KEY, model name, database connection string, session/auth secret, and daily message cap, with a matching example env file in the repo. AC-065: README deployment section states deploy steps to managed cloud hosting as a single instance and explicitly records prototype limitations: no horizontal scaling, no SLA, no compliance regime beyond basic data handling, no admin dashboard or analytics. AC-066: README states no billing is implemented in this free release, and notes that future monetisation is assumed to be a monthly Stripe subscription needing STRIPE_SECRET_KEY.
+
+**Related:** EPIC-005, AC-063, AC-064, AC-065, AC-066, REQ-TECH-STACK, REQ-SERVICES
+
+- ⚠ README itself has not been produced yet in this phase's input -- these are requirements for its content, not confirmation the document exists.
 <!-- sdlc:auto:end narrative -->
 
 <!-- sdlc:auto:start summary -->
-**Requirements version:** v1  
+**Requirements version:** v2  
 **Delivery scope:** lightweight  
-**Approved:** 2026-10-17
+**Approved:** 2026-10-22
 
 **Capabilities in scope:** Ask the assistant a question and get a streamed, token-by-token answer, Chat composer with the running message thread, Memory of earlier turns within the same conversation, Several saved conversations per account, listed newest-first in a sidebar, Start a new conversation, Rename a conversation, Delete a conversation, Saved message history reloaded when a conversation is reopened, Self-registration and sign-in for anyone on the internet, Each account sees only its own conversations, Answers rendered as formatted text with code blocks, Mobile-responsive chat layout, Setup and run instructions for the prototype, OpenAI hosted models generate every answer (needs OPENAI_API_KEY), Email-and-password sign-up, with no email verification or Google sign-in, A neutral, helpful general-assistant prompt the operator can change, Conversations stay private — no sharing, export or public links, Chronological conversation list only — no search, folders or favourites, Chat history kept indefinitely until the user deletes it, English-only interface
 
@@ -131,6 +323,19 @@ Open assumptions carried into this epic:
 | AC-010 | I am signed in as user A | I call any conversation or message endpoint using the identifier of a conversation owned by user B, whether to read, rename, delete or post to it | the server rejects the request with a not-found or forbidden response and makes no change to user B's data |
 | AC-011 | I am not signed in | I request any chat, conversation or message screen or endpoint directly by URL | I am refused access and redirected to the sign-in page, with no conversation content returned |
 | AC-012 | the first release has no sharing, export or public conversation links | I view any conversation | no share, publish, public-link or export control is present anywhere in the interface |
+
+### US-020: Move Sign out into the left navigation under Chat
+
+**Priority:** low
+
+> As a signed-in user, I want to find Sign out as a menu item in the left navigation under Chat, so that I can sign out from a consistent navigation location instead of the bottom of the chats panel.
+
+| ID | Given | When | Then |
+|---|---|---|---|
+| AC-067 | I am signed in and the chat screen is open | I look at the "Your chats" panel | the Sign out control is no longer shown at the bottom of that panel |
+| AC-068 | I am signed in and the chat screen is open | I open the left navigation | a "Sign out" menu item appears nested under "Chat" |
+| AC-069 | I am signed in | I select Sign out from the left navigation menu item | my session is invalidated and I am redirected to the sign-in page, matching the existing sign-out behaviour |
+| AC-070 | I am on a small/mobile viewport with the navigation collapsed behind a menu control | I open the menu and expand Chat | the Sign out item is reachable and triggers the same sign-out behaviour |
 
 ## EPIC-002: AI Chat with Streamed Answers
 

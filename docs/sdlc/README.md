@@ -5,7 +5,7 @@
 <!-- sdlc:auto:start overview -->
 build simple chat application
 
-**Documentation version:** v5
+**Documentation version:** v6
 <!-- sdlc:auto:end overview -->
 
 ## Contents
@@ -13,7 +13,7 @@ build simple chat application
 <!-- sdlc:auto:start contents -->
 | Document | State |
 |---|---|
-| [Requirements](requirements/README.md) | v1 approved |
+| [Requirements](requirements/README.md) | v2 approved |
 | [Architecture](architecture/README.md) | 7 entries |
 | [Development](development/README.md) | 21 entries |
 | [Testing](testing/README.md) | 1 entry |
@@ -29,8 +29,8 @@ build simple chat application
 | [Deployment guide](deployment/deployment-guide.md) | not deployed yet |
 | [Runbook](deployment/runbook.md) | not deployed yet |
 | [Release notes](deployment/release-notes.md) | 0 releases |
-| [Traceability matrix](traceability-matrix.md) | 19 requirements |
-| [Changelog](CHANGELOG.md) | 5 versions |
+| [Traceability matrix](traceability-matrix.md) | 20 requirements |
+| [Changelog](CHANGELOG.md) | 6 versions |
 <!-- sdlc:auto:end contents -->
 
 ## Open gaps
@@ -38,7 +38,15 @@ build simple chat application
 <!-- sdlc:auto:start open-gaps -->
 ### Requirements
 
-- Exact daily message cap numeric value is an open assumption not yet decided (per AC-031); requirements defer it to operator configuration at deploy time.
+- Password minimum length is referenced in multiple ACs (AC-001, AC-002, AC-007) as 'the stated minimum length' but the actual numeric value is not given in this input.
+- Minimum password length value not specified in input.
+- Reset link expiry duration and password minimum length values not specified.
+- Exact daily message cap value not yet decided (explicitly an open assumption per AC-031). System prompt default text content not specified beyond 'neutral, helpful general-assistant'. Model context-window trim size/strategy details not specified beyond 'configured context limit'.
+- Exact context-window size / trim threshold not specified.
+- Exact numeric daily message cap default not yet decided -- explicitly deferred to operator configuration at deployment (AC-031).
+- Maximum title length value not specified in input.
+- Exact default system prompt wording is not specified, only described as 'neutral, helpful general-assistant.'
+- README itself has not been produced yet in this phase's input -- these are requirements for its content, not confirmation the document exists.
 
 ### Development
 
