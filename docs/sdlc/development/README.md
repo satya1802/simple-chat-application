@@ -3,213 +3,107 @@
 > Maintained by QuorQ AI SDLC. Text between `sdlc:auto` markers is regenerated; anything outside them is yours and is kept.
 
 <!-- sdlc:auto:start narrative -->
-### DEV-PLAN-v1 · approved · source: plan:v1
+### PLAN-V2 · approved · source: plan:v2
 
-Development plan version 1 is approved, organizing all 19 stories across 5 epics into 4 sprints, each with 20-point capacity.
+Approved development plan, version 2, organizing the full backlog (5 epics, 20 stories, ~90 tasks) into 4 sprints.
 
-Sprint 1 goal: stand up account registration/sign-in, LLM provider configuration, and the ability to start a conversation (capacity 20). Sprint 2 goal: add password recovery, enforce per-account data isolation, and ship the core streamed chat experience (capacity 20). Sprint 3 goal: deliver the full saved-conversations experience -- sidebar, reopening history, in-conversation memory, rename and delete (capacity 20). Sprint 4 goal: add the daily usage cap, formatted/code-block rendering, mobile responsiveness, and the operator setup README (capacity 20). Backlog structure: EPIC-001 Account Access and Private Data Isolation (US-001..US-004), EPIC-002 AI Chat with Streamed Answers (US-005..US-009), EPIC-003 Saved Conversations (US-010..US-014), EPIC-004 Responsive Web Experience (US-015, US-016), EPIC-005 Prototype Setup and Operation (US-017..US-019).
+Plan status: approved, version 2.
+Sprints:
+- Sprint 1 (capacity 20): goal = stand up account registration/sign-in, LLM provider configuration, and the ability to start a conversation.
+- Sprint 2 (capacity 20): goal = add password recovery, enforce per-account data isolation, ship the core streamed chat experience.
+- Sprint 3 (capacity 20): goal = deliver the full saved-conversations experience (sidebar, reopening history, in-conversation memory, rename/delete).
+- Sprint 4 (capacity 20): goal = add the daily usage cap, formatted/code-block rendering, mobile responsiveness, operator setup README.
 
-**Related:** US-001, US-002, US-003, US-004, US-005, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014, US-015, US-016, US-017, US-018, US-019
+Backlog:
+EPIC-001 Account Access and Private Data Isolation:
+ - US-001 Self-register with email and password (5pts, backend-agent): registration endpoint w/ validation; hash password & persist user; sign-up form UI; auto sign-in after registration; test registration edge cases.
+ - US-002 Sign in and sign out (5pts, backend-agent): login endpoint; logout endpoint; sign-in page; route guard for unauthenticated access; test credential failure messaging.
+ - US-003 Reset a forgotten password (5pts, backend-agent): password_reset_tokens table; forgot-password endpoint w/ SendGrid send; reset-password endpoint; forgot/reset password UI pages; test expired/reused tokens.
+ - US-004 See only my own conversations (5pts, security-agent): ownership middleware on conversation/message endpoints; scope all queries by user id; guard unauthenticated chat routes; remove share/export/public-link controls; cross-account access penetration tests.
+EPIC-002 AI Chat with Streamed Answers:
+ - US-005 Ask a question and receive a streamed answer (8pts, backend-agent): streaming message endpoint; OpenAI streaming completion integration; persist completed exchange; frontend streaming consumer; handle stream errors/retries.
+ - US-006 Chat composer and running message thread (5pts, frontend-agent): chat thread component; auto-growing composer; guard empty/whitespace submissions; auto-scroll during streaming.
+ - US-007 Assistant remembers earlier turns in the same conversation (3pts, backend-agent): conversation context assembler; context-window trimming; ensure system prompt always included; test cross-conversation memory isolation.
+ - US-008 Answers rendered as formatted text with code blocks (5pts, frontend-agent): sanitized markdown renderer; code block component; handle incomplete streaming markdown; test sanitisation against script injection.
+ - US-009 Daily message cap per account (5pts, backend-agent): Redis-backed daily counter; enforce cap before LLM call; clear limit-reached response; surface limit message in chat UI; make cap operator-configurable.
+EPIC-003 Saved Conversations:
+ - US-010 Start a new conversation (3pts, frontend-agent): conversation creation endpoint; New Chat UI action; auto-generate conversation title; avoid orphaned empty conversations.
+ - US-011 Browse my conversations newest-first in a sidebar (3pts, frontend-agent): conversation list endpoint ordered by activity; sidebar list component; empty sidebar state; reorder sidebar on new activity.
+ - US-012 Reopen a conversation and see its saved history (3pts, frontend-agent): conversation history endpoint; load/render history on selection; highlight selected conversation; test cross-session persistence.
+ - US-013 Rename a conversation (2pts, backend-agent): rename endpoint w/ validation; rename UI; truncate long titles in sidebar display.
+ - US-014 Delete a conversation (2pts, backend-agent): delete endpoint w/ cascading cleanup; delete confirmation dialog; switch view after deletion.
+EPIC-004 Responsive Web Experience:
+ - US-015 Use the chat on a phone (5pts, frontend-agent): responsive breakpoints; collapsible mobile sidebar; handle on-screen keyboard viewport shifts; test responsive layouts.
+ - US-016 Consistent English-only interface (1pt, frontend-agent): audit interface/email text; confirm no localization control exists; test non-English browser locale load.
+EPIC-005 Prototype Setup and Operation:
+ - US-017 Configure the hosted LLM provider (3pts, backend-agent): LLM configuration schema; fail-fast startup validation; wire configured model into OpenAI client; ensure key never exposed.
+ - US-018 Configure the assistant's system prompt (2pts, backend-agent): configurable system prompt; inject prompt into every LLM request; keep prompt hidden from end users.
+ - US-019 Set up and run the prototype from written instructions (3pts, devops-agent): write setup/run instructions; document required environment variables; write deployment/limitations section; document billing status.
+Unassigned-to-epic item: US-020 Move Sign out into the left navigation under Chat (2pts, frontend-agent).
 
-- ⚠ Input does not provide an explicit field mapping individual stories to a specific sprint number -- only sprint goals (free text) and a flat item list are given, so story-to-sprint assignment cannot be stated with certainty.
+**Related:** EPIC-001, EPIC-002, EPIC-003, EPIC-004, EPIC-005, US-001, US-002, US-003, US-004, US-005, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014, US-015, US-016, US-017, US-018, US-019, US-020
 
-### DEV-RUN-2026 · draft · source: dev:run-status
+- ⚠ Plan does not explicitly state which stories/tasks are assigned to which sprint -- only sprint goal text implies likely coverage; a formal item-to-sprint mapping was not provided.
 
-The development run is reported as 'completed', but recorded ticket status is only available for 5 of the 19 planned stories.
+### SPRINT-1 · approved · source: plan:Sprint 1
 
-Reported run status: completed. Tickets with recorded status: US-001 delivered (commit 36c62e7144ed8b9c50641ab4e11244aea3140cd0), US-002 delivered (commit 36c62e7144ed8b9c50641ab4e11244aea3140cd0), US-010 delivered (commit 89a5106bddea453f1c025d64a8b02204286cd2a7), US-017 delivered (commit 89a5106bddea453f1c025d64a8b02204286cd2a7), US-018 delivered (commit 89a5106bddea453f1c025d64a8b02204286cd2a7). No ticket status was provided in the input for US-003, US-004, US-005, US-006, US-007, US-008, US-009, US-011, US-012, US-013, US-014, US-015, US-016, or US-019.
+Sprint 1 goal: stand up account registration/sign-in, LLM provider configuration, and the ability to start a conversation.
 
-**Related:** US-003, US-004, US-005, US-006, US-007, US-008, US-009, US-011, US-012, US-013, US-014, US-015, US-016, US-019
+Capacity: 20 points. Goal as stated in plan: 'Stand up account registration/sign-in, LLM provider configuration, and the ability to start a conversation.' No explicit list of which backlog items were pulled into this sprint was provided; related story ids listed here are inferred from the goal wording only.
 
-- ⚠ Discrepancy: the run status says 'completed' but 14 of 19 planned stories have no recorded ticket/delivery status -- unclear whether they were descoped, still in progress, or simply omitted from this report.
+**Related:** US-001, US-002, US-017
 
-### US-001 · approved · source: dev:US-001
+- ⚠ No explicit sprint-item assignment given; related_ids are inferred from goal text, not confirmed by the input.
 
-Self-registration with email and password was delivered.
+### SPRINT-2 · approved · source: plan:Sprint 2
 
-Story US-001 (5 points, backend-agent) ticket status: delivered, commit 36c62e7144ed8b9c50641ab4e11244aea3140cd0. Planned tasks: build registration endpoint with validation (backend-agent); hash password and persist user (backend-agent); build sign-up form UI (frontend-agent); auto sign-in after registration (frontend-agent); test registration edge cases (qa-agent).
+Sprint 2 goal: add password recovery, enforce per-account data isolation, and ship the core streamed chat experience.
 
-**Related:** US-001-T1, US-001-T2, US-001-T3, US-001-T4, US-001-T5
+Capacity: 20 points. Goal as stated in plan: 'Add password recovery, enforce per-account data isolation, and ship the core streamed chat experience.' No explicit list of which backlog items were pulled into this sprint was provided; related story ids listed here are inferred from the goal wording only.
 
-- ⚠ Input confirms the parent ticket was delivered but does not break out completion status per individual task (T1-T5).
+**Related:** US-003, US-004, US-005, US-006
 
-### US-002 · approved · source: dev:US-002
+- ⚠ No explicit sprint-item assignment given; related_ids are inferred from goal text, not confirmed by the input.
 
-Sign in and sign out functionality was delivered.
+### SPRINT-3 · approved · source: plan:Sprint 3
 
-Story US-002 (5 points, backend-agent) ticket status: delivered, commit 36c62e7144ed8b9c50641ab4e11244aea3140cd0. Planned tasks: implement login endpoint (backend-agent); implement logout endpoint (backend-agent); build sign-in page (frontend-agent); add route guard for unauthenticated access (frontend-agent); test credential failure messaging (qa-agent).
+Sprint 3 goal: deliver the full saved-conversations experience -- sidebar, reopening history, in-conversation memory, rename and delete.
 
-**Related:** US-002-T1, US-002-T2, US-002-T3, US-002-T4, US-002-T5
+Capacity: 20 points. Goal as stated in plan: 'Deliver the full saved-conversations experience: sidebar, reopening history, in-conversation memory, rename and delete.' No explicit list of which backlog items were pulled into this sprint was provided; related story ids listed here are inferred from the goal wording only.
 
-- ⚠ Input confirms the parent ticket was delivered but does not break out completion status per individual task (T1-T5).
+**Related:** US-010, US-011, US-012, US-013, US-014, US-007
 
-### US-003 · draft · source: plan:US-003
+- ⚠ No explicit sprint-item assignment given; related_ids are inferred from goal text, not confirmed by the input.
 
-Password reset via forgotten-password flow is planned but has no reported development status.
+### SPRINT-4 · approved · source: plan:Sprint 4
 
-Story US-003 (5 points, backend-agent). Planned tasks: create password_reset_tokens table (backend-agent); implement forgot-password endpoint with SendGrid send (integration-agent); implement reset-password endpoint (backend-agent); build forgot/reset password UI pages (frontend-agent); test expired and reused tokens (qa-agent).
+Sprint 4 goal: add the daily usage cap, formatted/code-block rendering, mobile responsiveness, and the operator setup README.
 
-**Related:** US-003-T1, US-003-T2, US-003-T3, US-003-T4, US-003-T5
+Capacity: 20 points. Goal as stated in plan: 'Add the daily usage cap, formatted/code-block rendering, mobile responsiveness, and the operator setup README.' No explicit list of which backlog items were pulled into this sprint was provided; related story ids listed here are inferred from the goal wording only.
 
-- ⚠ No development ticket or delivery status reported for US-003, though it is in the approved plan; conflicts with the overall run status of 'completed'.
+**Related:** US-009, US-008, US-015, US-019
 
-### US-004 · draft · source: plan:US-004
+- ⚠ No explicit sprint-item assignment given; related_ids are inferred from goal text, not confirmed by the input.
 
-Per-account conversation data isolation is planned but has no reported development status.
+### DEV-RUN-STATUS · draft · source: dev:run
 
-Story US-004 (5 points, security-agent). Planned tasks: add ownership middleware to conversation/message endpoints (security-agent); scope all queries by authenticated user id (backend-agent); guard unauthenticated access to chat routes (frontend-agent); remove any share/export/public-link controls (frontend-agent); cross-account access penetration tests (qa-agent).
+Development run input is labeled 'completed' overall, but only one of the 20 planned stories (US-020) has a recorded ticket with delivery evidence.
 
-**Related:** US-004-T1, US-004-T2, US-004-T3, US-004-T4, US-004-T5
+The development run input states overall status 'completed.' The only concrete ticket record provided is for US-020 (status=delivered, with a commit hash). No ticket records, commits, statuses, or notes were provided for US-001 through US-019 or any of their associated tasks, despite the plan defining detailed work for all of them across 4 sprints.
 
-- ⚠ No development ticket or delivery status reported for US-004, though it is in the approved plan; conflicts with the overall run status of 'completed'.
+**Related:** US-001, US-002, US-003, US-004, US-005, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014, US-015, US-016, US-017, US-018, US-019, US-020
 
-### US-005 · draft · source: plan:US-005
+- ⚠ Conflict: run status is reported as 'completed' but delivery evidence exists for only 1 of 20 planned stories -- this discrepancy should be confirmed with the development/orchestration agent rather than assumed.
+- ⚠ No commit, status, or test information was provided for US-001 through US-019 or their sub-tasks; these should be treated as undocumented/unknown until further input is supplied.
+- ⚠ Unclear whether 'completed' refers to only the subset of work actually run in this cycle (e.g. just US-020) or to the full backlog -- input does not clarify scope of the run.
 
-Streamed question-and-answer chat is planned but has no reported development status.
+### TICKET-US-020 · approved · source: dev:US-020
 
-Story US-005 (8 points, backend-agent). Planned tasks: implement streaming message endpoint (backend-agent); integrate OpenAI streaming completion call (integration-agent); persist completed exchange (backend-agent); build frontend streaming consumer (frontend-agent); handle stream errors and retries (frontend-agent).
+Ticket for moving the Sign out control into the left navigation under Chat was delivered.
 
-**Related:** US-005-T1, US-005-T2, US-005-T3, US-005-T4, US-005-T5
+Ticket US-020 ('Move Sign out into the left navigation under Chat') is recorded with status=delivered and commit=c526d491a46909b0a7dba53d1fd53f0ee84868f0. This is the only ticket in the development run input with concrete delivery evidence.
 
-- ⚠ No development ticket or delivery status reported for US-005, though it is in the approved plan; conflicts with the overall run status of 'completed'.
+**Related:** US-020
 
-### US-006 · draft · source: plan:US-006
-
-Chat composer and running message thread is planned but has no reported development status.
-
-Story US-006 (5 points, frontend-agent). Planned tasks: build chat thread component (frontend-agent); build auto-growing composer (frontend-agent); guard empty/whitespace submissions (frontend-agent); implement auto-scroll during streaming (frontend-agent).
-
-**Related:** US-006-T1, US-006-T2, US-006-T3, US-006-T4
-
-- ⚠ No development ticket or delivery status reported for US-006, though it is in the approved plan; conflicts with the overall run status of 'completed'.
-
-### US-007 · draft · source: plan:US-007
-
-In-conversation memory of earlier turns is planned but has no reported development status.
-
-Story US-007 (3 points, backend-agent). Planned tasks: build conversation context assembler (backend-agent); implement context-window trimming (backend-agent); ensure system prompt always included (backend-agent); test cross-conversation memory isolation (qa-agent).
-
-**Related:** US-007-T1, US-007-T2, US-007-T3, US-007-T4
-
-- ⚠ No development ticket or delivery status reported for US-007, though it is in the approved plan; conflicts with the overall run status of 'completed'.
-
-### US-008 · draft · source: plan:US-008
-
-Formatted/code-block answer rendering is planned but has no reported development status.
-
-Story US-008 (5 points, frontend-agent). Planned tasks: integrate sanitized markdown renderer (frontend-agent); build code block component (frontend-agent); handle incomplete streaming markdown (frontend-agent); test sanitisation against script injection (qa-agent).
-
-**Related:** US-008-T1, US-008-T2, US-008-T3, US-008-T4
-
-- ⚠ No development ticket or delivery status reported for US-008, though it is in the approved plan; conflicts with the overall run status of 'completed'.
-
-### US-009 · draft · source: plan:US-009
-
-Daily message cap per account is planned but has no reported development status.
-
-Story US-009 (5 points, backend-agent). Planned tasks: add Redis-backed daily counter (backend-agent); enforce cap before LLM call (backend-agent); return clear limit-reached response (backend-agent); surface limit message in chat UI (frontend-agent); make the cap operator-configurable (devops-agent).
-
-**Related:** US-009-T1, US-009-T2, US-009-T3, US-009-T4, US-009-T5
-
-- ⚠ No development ticket or delivery status reported for US-009, though it is in the approved plan; conflicts with the overall run status of 'completed'.
-
-### US-010 · approved · source: dev:US-010
-
-Starting a new conversation was delivered.
-
-Story US-010 (3 points, frontend-agent) ticket status: delivered, commit 89a5106bddea453f1c025d64a8b02204286cd2a7. Planned tasks: implement conversation creation endpoint (backend-agent); build New Chat UI action (frontend-agent); auto-generate conversation title (backend-agent); avoid orphaned empty conversations (backend-agent).
-
-**Related:** US-010-T1, US-010-T2, US-010-T3, US-010-T4
-
-- ⚠ Input confirms the parent ticket was delivered but does not break out completion status per individual task (T1-T4).
-
-### US-011 · draft · source: plan:US-011
-
-Browsing conversations newest-first in a sidebar is planned but has no reported development status.
-
-Story US-011 (3 points, frontend-agent). Planned tasks: implement conversation list endpoint ordered by activity (backend-agent); build sidebar list component (frontend-agent); build empty sidebar state (frontend-agent); reorder sidebar on new activity (frontend-agent).
-
-**Related:** US-011-T1, US-011-T2, US-011-T3, US-011-T4
-
-- ⚠ No development ticket or delivery status reported for US-011, though it is in the approved plan; conflicts with the overall run status of 'completed'.
-
-### US-012 · draft · source: plan:US-012
-
-Reopening a conversation and viewing its saved history is planned but has no reported development status.
-
-Story US-012 (3 points, frontend-agent). Planned tasks: implement conversation history endpoint (backend-agent); load and render history on selection (frontend-agent); highlight selected conversation (frontend-agent); test cross-session persistence (qa-agent).
-
-**Related:** US-012-T1, US-012-T2, US-012-T3, US-012-T4
-
-- ⚠ No development ticket or delivery status reported for US-012, though it is in the approved plan; conflicts with the overall run status of 'completed'.
-
-### US-013 · draft · source: plan:US-013
-
-Renaming a conversation is planned but has no reported development status.
-
-Story US-013 (2 points, backend-agent). Planned tasks: implement rename endpoint with validation (backend-agent); build rename UI (frontend-agent); truncate long titles in sidebar display (frontend-agent).
-
-**Related:** US-013-T1, US-013-T2, US-013-T3
-
-- ⚠ No development ticket or delivery status reported for US-013, though it is in the approved plan; conflicts with the overall run status of 'completed'.
-
-### US-014 · draft · source: plan:US-014
-
-Deleting a conversation is planned but has no reported development status.
-
-Story US-014 (2 points, backend-agent). Planned tasks: implement delete endpoint with cascading cleanup (backend-agent); build delete confirmation dialog (frontend-agent); switch view after deletion (frontend-agent).
-
-**Related:** US-014-T1, US-014-T2, US-014-T3
-
-- ⚠ No development ticket or delivery status reported for US-014, though it is in the approved plan; conflicts with the overall run status of 'completed'.
-
-### US-015 · draft · source: plan:US-015
-
-Using the chat on a phone (responsive layout) is planned but has no reported development status.
-
-Story US-015 (5 points, frontend-agent). Planned tasks: build responsive breakpoints (frontend-agent); implement collapsible mobile sidebar (frontend-agent); handle on-screen keyboard viewport shifts (frontend-agent); test responsive layouts (qa-agent).
-
-**Related:** US-015-T1, US-015-T2, US-015-T3, US-015-T4
-
-- ⚠ No development ticket or delivery status reported for US-015, though it is in the approved plan; conflicts with the overall run status of 'completed'.
-
-### US-016 · draft · source: plan:US-016
-
-Consistent English-only interface is planned but has no reported development status.
-
-Story US-016 (1 point, frontend-agent). Planned tasks: audit all interface and email text (frontend-agent); confirm no localization control exists (frontend-agent); test non-English browser locale load (qa-agent).
-
-**Related:** US-016-T1, US-016-T2, US-016-T3
-
-- ⚠ No development ticket or delivery status reported for US-016, though it is in the approved plan; conflicts with the overall run status of 'completed'.
-
-### US-017 · approved · source: dev:US-017
-
-Hosted LLM provider configuration was delivered.
-
-Story US-017 (3 points, backend-agent) ticket status: delivered, commit 89a5106bddea453f1c025d64a8b02204286cd2a7. Planned tasks: add LLM configuration schema (backend-agent); implement fail-fast startup validation (backend-agent); wire configured model into OpenAI client (integration-agent); ensure key is never exposed (security-agent).
-
-**Related:** US-017-T1, US-017-T2, US-017-T3, US-017-T4
-
-- ⚠ Input confirms the parent ticket was delivered but does not break out completion status per individual task (T1-T4).
-
-### US-018 · approved · source: dev:US-018
-
-Configurable assistant system prompt was delivered.
-
-Story US-018 (2 points, backend-agent) ticket status: delivered, commit 89a5106bddea453f1c025d64a8b02204286cd2a7. Planned tasks: add configurable system prompt (backend-agent); inject prompt into every LLM request (backend-agent); keep prompt hidden from end users (frontend-agent).
-
-**Related:** US-018-T1, US-018-T2, US-018-T3
-
-- ⚠ Input confirms the parent ticket was delivered but does not break out completion status per individual task (T1-T3).
-
-### US-019 · draft · source: plan:US-019
-
-Setting up and running the prototype from written instructions is planned but has no reported development status.
-
-Story US-019 (3 points, devops-agent). Planned tasks: write setup and run instructions (devops-agent); document required environment variables (devops-agent); write deployment and limitations section (devops-agent); document billing status (devops-agent).
-
-**Related:** US-019-T1, US-019-T2, US-019-T3, US-019-T4
-
-- ⚠ No development ticket or delivery status reported for US-019, though it is in the approved plan; conflicts with the overall run status of 'completed'. This story also covers the operator setup README, which is relevant to downstream deployment documentation.
+- ⚠ No test or review evidence accompanies this delivery record beyond the commit reference -- QA/verification status for this specific change was not provided.
 <!-- sdlc:auto:end narrative -->
